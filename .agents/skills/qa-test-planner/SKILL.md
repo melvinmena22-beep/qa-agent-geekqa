@@ -78,6 +78,7 @@ Activado por su nombre (o nombre parcial) o como el primer paso en un comando pe
     -   Clasifica cada escenario con `testType` (por ejemplo, Funcional, Validación de datos, Integración, Compatibilidad, Rendimiento o Seguridad), `severity` (Crítica, Alta, Media o Baja según el impacto potencial de que falle el caso) y `severityRationale` (justificación breve). La severidad del caso expresa riesgo/impacto de la funcionalidad, no un defecto observado.
     -   Los escenarios deben cubrir requisitos funcionales, comportamiento UI/UX, y casos extremos potenciales.
     -   Incluye `testTechniques` en el JSON. Selecciona y justifica, según los requisitos verificables y sus riesgos, las técnicas pertinentes: análisis de valores límite, particionamiento en clases de equivalencia, transición de estados, tablas de decisión, adivinación de errores u otras técnicas modernas apropiadas (por ejemplo, pruebas basadas en propiedades o combinatorias). No fuerces técnicas ni derives reglas no documentadas.
+    -   La **adivinación de errores es obligatoria**: incluye al menos 2 escenarios con `technique: "Adivinación de errores"`, cada uno con `errorGuessingRisk` (defecto anticipado y por qué es probable), elegidos del catálogo de `references/test-case-best-practices.md` según lo que la historia expone. Cuentan dentro de los 10 escenarios. Si el comportamiento esperado no está definido, usa `clarificationRequired: true` en lugar de inventarlo.
     -   Incluye `projectName` con el nombre funcional del producto/proyecto bajo prueba; no lo infieras del nombre de otra historia ni de una plantilla fija.
     -   Cuando sea útil, incluye `technique` en cada escenario para trazar la técnica aplicada.
     -   Sigue las mejores prácticas descritas en `references/test-case-best-practices.md`.
@@ -86,6 +87,7 @@ Activado por su nombre (o nombre parcial) o como el primer paso en un comando pe
 8.  **Generar Archivos del Plan de Pruebas.**
     -   Produce un reporte HTML detallado (`-plan.html`) usando la plantilla en la carpeta `templates`, incluyendo las técnicas ISTQB justificadas y los escenarios de prueba generados. Cada fila de escenario debe mostrar el valor `testPolarity` junto con su ID, descripción, tipo de prueba y criterios cubiertos.
     -   El HTML debe mostrar la evaluación INVEST, el resumen del análisis estático, sus hallazgos, preguntas abiertas y limitaciones antes de los escenarios. Mapea `staticAnalysis` a `{{static_analysis_assessment}}`, `{{static_analysis_summary}}`, `{{static_analysis_invest}}`, `{{static_analysis_findings}}`, `{{static_analysis_questions}}` y `{{static_analysis_limitations}}` en la plantilla. Genera filas HTML para los hallazgos escapando el contenido; si no hay hallazgos, preguntas o limitaciones, presenta explícitamente ese estado en vez de dejar la sección vacía.
+    -   Declara `authentication` en el plan: `required: true` cuando la funcionalidad no es pública (usuarios autorizados, perfiles, roles, permisos, backoffice o módulos internos como Odoo o SAP), con `reason` y `evidence` citando la historia; `required: false` solo si toda la funcionalidad es accesible sin iniciar sesión. Con `required: true`, el runner no ejecuta pruebas hasta tener un usuario y contraseña válidos.
     -   Genera un archivo de metadatos JSON (`-plan.json`) que contiene `staticAnalysis` (con `summary`, `overallAssessment`, `investAssessment`, `findings`, `openQuestions`, `limitations`, `ambiguityQuestions` y `proposedAcceptanceCriteria`), los arreglos `selectedSkills` y `testScenarios`, y cualquier otra información clave para habilidades posteriores. `testScenarios` contiene los 10 escenarios de validación cuando hay una historia suficiente para evaluarlos. Cada hallazgo incluye `id`, `category`, `severity`, `source`, `evidence`, `impact` y `recommendation`.
     -   El HTML debe incluir secciones explícitas de preguntas de ambigüedad/puntos ciegos y criterios de aceptación propuestos, indicando que estos últimos requieren aprobación y no son requisitos vigentes. Mapea `staticAnalysis.ambiguityQuestions` a `{{static_analysis_ambiguity_questions}}` y `staticAnalysis.proposedAcceptanceCriteria` a `{{static_analysis_proposed_acceptance_criteria}}`; genera filas o listas HTML con contenido escapado e indica explícitamente cuando no haya datos por falta de historia.
 
@@ -130,6 +132,11 @@ El archivo `{story-id}-plan.json` DEBE tener esta estructura mínima para que el
   "storyId": "US_001",
   "projectName": "Nombre del Proyecto",
   "url": "https://example.com",
+  "authentication": {
+    "required": true,
+    "reason": "La funcionalidad es un módulo interno al que solo acceden usuarios autorizados.",
+    "evidence": "historia.md, CA-01: \"Como usuario autorizado de Bodeguita...\""
+  },
   "selectedSkills": [
     "run-tests-browser",
     "run-accessibility-tests",

@@ -4,7 +4,7 @@ description: Analiza fallos de pruebas, genera reportes de errores y crea Bugs e
 compatibility:
   gemini: ">=2.5.0"
 metadata:
-  version: 1.1.0
+  version: 2.0.0
   author: Gemini
 allowed-tools: "MCP Playwright, azure-devops.create_azure_bug, azure-devops.search_work_items"
 ---
@@ -18,46 +18,46 @@ Usa esta habilidad después de la ejecución de pruebas para analizar fallos y g
 
 ## Entrada
 
-- **Reporte de Ejecución:** El archivo `execution-report.json` del skill `execute-tests`, que contiene la lista de pruebas fallidas y rutas a evidencia.
+- **Reporte de Ejecución:** El archivo `execution/execution-report.json` (formato de `schemas/execution-report.schema.json`), que contiene los escenarios fallidos y rutas a evidencia.
 
 ## Pasos
 
 1.  **Analizar Fallos**:
-    -   Lee el archivo `execution-report.json` y filtra todas las pruebas con estado "FAILED".
+    -   Lee el archivo `execution-report.json` y filtra los escenarios con `status` igual a `FAIL`.
     -   Si no se encuentran fallos, sale de la habilidad.
-2.  **Generar Reportes de Errores**:
-    -   Para cada prueba fallida reproducible, crea un reporte usando `templates/bug_template.md` con título, pasos de reproducción, resultado esperado y actual, ambiente, severidad, impacto y evidencia.
-    -   Asigna una severidad (Crítica, Alta, Media, Baja) basada en un análisis del fallo.
-    -   Genera un ID de error único (ej. `BUG-{story-id}-{nn}`).
-    -   Copia toda la evidencia asociada (capturas de pantalla, logs) en el directorio `bugs/evidence/`, renombrando los archivos para que coincidan con el ID del error.
-    -   Selecciona la captura que muestra el estado fallido y conserva su ruta relativa al workspace, por ejemplo `3-outputs/run/US-78/bugs/evidence/BUG-US-78-01.png`.
-3.  **Crear Bugs en Azure DevOps**:
-  -   Usa el MCP `azure-devops.create_azure_bug` para cada fallo reproducible y confirmado.
-  -   Pasa `evidenceFilePath` con la ruta de la captura guardada en `bugs/evidence/`, además del texto `evidence`. La herramienta sube la imagen y la agrega al work item como archivo adjunto; no basta con escribir el nombre o la ruta en la descripción.
-  -   Mapea el título a `System.Title`, los pasos a `Microsoft.VSTS.TCM.ReproSteps`, el ambiente/navegador a `Microsoft.VSTS.TCM.SystemInfo`, y la severidad a `Microsoft.VSTS.Common.Severity`.
-  -   Incluye resultado esperado, actual, impacto y evidencia en la descripción. La herramienta hereda Area e Iteration de la historia y vincula el bug con ella.
-  -   No crees bugs por pruebas omitidas, bloqueadas por ambiente o errores no reproducibles. No dupliques un bug existente; registra su ID si se identifica.
-  -   Registra el `azureDevOpsId`, URL, nombre de la evidencia y `evidenceAttached` devuelto por la herramienta en el reporte local.
-  -   Confirma `evidenceAttached: true` en la respuesta de la herramienta antes de afirmar que la imagen quedó adjunta. Si no hay captura disponible o falla la carga, conserva el bug/reporte local y registra claramente la advertencia; nunca declares que se adjuntó.
-4.  **Guardar Reportes**:
-    -   Guarda los reportes de errores consolidados como un archivo JSON único (`{story-id}-bugs.json`) y un archivo Markdown (`{story-id}-bugs.md`) en el directorio de salida `bugs`.
+    -   Antes de reportar, comprueba que el test que falló es fiable: tiene aserciones reales (no `expect(true)`), navega al dominio de la URL de pruebas de la historia y corresponde a un escenario del plan. Un fallo de un test que no cumple esto es un defecto del script, no un bug.
+    -   Un fallo con `failureType: "TIMEOUT"` o un caso con `flaky: true` no es un bug salvo que lo reproduzcas dos veces de forma idéntica.
+2.  **Decidir los datos del bug** (lo único que aporta el agente):
+    -   `title`: breve y observable (qué falla, dónde), sin especular la causa.
+    -   `severity`: `1 - Critical` (bloquea el proceso o pierde datos), `2 - High` (función principal incorrecta sin alternativa), `3 - Medium` (falla con alternativa), `4 - Low` (cosmético).
+    -   `impact`: usuarios, proceso o datos afectados, según la evidencia.
+    -   Opcional: `expectedResult`, `actualResult` o `evidence` solo para precisar lo que el plan y el error no dicen (p. ej. la respuesta HTTP observada al reproducirlo con MCP Playwright).
+3.  **Crear el bug con `azure-devops.create_azure_bug`** (uno por escenario fallido, aunque falle en varios navegadores), pasando `sourceStoryId`, `scenarioId` y los datos anteriores. La herramienta hace el resto de forma determinista:
+    -   **Paso a paso:** login si la historia lo exige, precondiciones y los pasos del plan, marcando en rojo el paso que falló (según los `test.step` de la ejecución) con el error observado.
+    -   **Evidencias adjuntas:** captura del fallo (también incrustada en el paso que falla), video, trace de Playwright y estado de la página, de todos los navegadores donde falló.
+    -   **System Info y descripción:** URL, navegador, sistema operativo, usuario de prueba, fecha, escenario, criterios relacionados, resultado esperado frente a obtenido, resultado de cada paso y criterios de aceptación de la historia.
+    -   **Sin duplicados:** etiqueta `QA-US{id}-SC_NNN`. Si ya existe un bug abierto para el escenario, adjunta las evidencias nuevas como re-test y añade un comentario, sin crear otro.
+    -   **Registro local:** `bugs/{story-id}-bugs.json`, `bugs/{story-id}-bugs.md` y `bugs/evidence/BUG-{story-id}-SC_NNN/`, y vincula `bugId` y `azureDevOpsId` en `execution-report.json`. No escribas esos archivos a mano.
+    -   La herramienta rechaza el bug si el escenario no figura como `FAIL`, si la ejecución no dejó evidencias o si solo falló por tiempo de espera (pasa `timeoutReproduced: true` únicamente después de reproducirlo).
+    -   Para revisar el bug sin crearlo, usa `dryRun: true` (o `node tools/azure-devops-importer.mjs bug-preview {id} SC_NNN`).
+    -   No crees bugs por pruebas omitidas, bloqueadas por ambiente o errores no reproducibles.
+4.  **Informar:** cita en tu salida el ID y la URL de Azure DevOps que devuelve la herramienta y si el bug ya existía (`alreadyExists`). Si la herramienta falla, no afirmes que el bug se creó.
 
 ## Salida
 
--   **Reportes de Errores:** Un archivo JSON y un archivo Markdown en el directorio `3-outputs/run/{story-id}/bugs/`.
--   **Evidencia:** Todos los archivos de evidencia copiados a `3-outputs/run/{story-id}/bugs/evidence/`.
+-   **Azure DevOps:** un Bug por escenario fallido, hijo de la historia, con Repro Steps, System Info, descripción, etiquetas y evidencias adjuntas.
+-   **Reportes locales:** `3-outputs/run/{story-id}/bugs/{story-id}-bugs.json` y `.md`, con las evidencias en `bugs/evidence/`.
 
 ## Criterios de Finalización
 
-- ✅ Un reporte `bugs.json` y `bugs.md` es creado si alguna prueba falló.
-- ✅ Toda la evidencia para pruebas fallidas es copiada y renombrada en el directorio `bugs/evidence/`.
-- ✅ La captura asociada al bug se adjunta en Azure DevOps como archivo, y el reporte local indica si la carga quedó confirmada.
-- ✅ Bugs reproducibles se crean en Azure DevOps cuando el MCP está configurado.
+- ✅ Cada escenario con fallo confirmado del producto tiene su bug (nuevo o re-test del existente) en Azure DevOps.
+- ✅ El bug tiene el paso a paso del plan, el paso que falla marcado y las evidencias adjuntas (captura, video, trace).
+- ✅ `bugs.json`, `bugs.md` y `execution-report.json` reflejan el ID y la URL del bug.
 
 ## Si Falla
 
 | Problema | Acción |
 |----------|--------|
 | Reporte de ejecución no encontrado | Registra un error y detiene. Esta habilidad no puede ejecutarse sin un reporte de ejecución de pruebas. |
-| Archivos de evidencia faltantes | Registra una advertencia y crea el reporte de error con una nota de que la evidencia no fue encontrada. |
+| La herramienta rechaza el bug por falta de evidencias | Vuelve a ejecutar el caso para que Playwright genere captura, video y trace; no crees el bug sin ellas. |
 | MCP de Azure DevOps no disponible | Registra una advertencia, conserva el reporte local y no afirmes que el bug fue creado en Azure. |

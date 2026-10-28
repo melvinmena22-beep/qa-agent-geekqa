@@ -26,14 +26,14 @@
       "command": "npx",
       "args": [
         "-y",
-         "@playwright/mcp@latest"
+         "@playwright/mcp@0.0.83"
       ]
     },
     "playwright-firefox": {
       "command": "npx",
       "args": [
         "-y",
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.83",
         "--browser",
         "firefox"
       ]
@@ -42,7 +42,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@playwright/mcp@latest",
+        "@playwright/mcp@0.0.83",
         "--browser",
         "webkit"
       ]
@@ -56,6 +56,9 @@
         "AZDO_ORG_URL": "https://dev.azure.com/GSID-Autogestion",
         "AZDO_PROJECT": "Pruebas-TI IA"
       }
+    },
+    "graphify": {
+      "url": "https://api.graphify.com/mcp"
     }
   }
 }

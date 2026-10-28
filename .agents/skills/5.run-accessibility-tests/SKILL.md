@@ -26,9 +26,9 @@ Usa esta habilidad para auditar la URL del ambiente indicada en el plan de prueb
 1.  **Configuración y Navegación**:
     -   Extrae la URL objetivo del plan de pruebas. Si falta o no es válida, registra el bloqueo y no inventes una URL.
     -   Abre Chromium mediante MCP Playwright y navega a la URL indicada. No uses `run_shell_command`, ejecución local, `@axe-core/playwright` ni herramientas fuera de MCP Playwright.
-    -   Si el runner o el navegador informa que no puede comprobar el ambiente por VPN, proxy, certificado o autenticación, ofrece al usuario abrir la URL en una pestaña del navegador para que inicie sesión directamente en el portal. Pausa y continúa solo después de que el usuario confirme que terminó.
-    -   Nunca solicites que comparta usuario o contraseña en el chat, nunca captures los campos de credenciales, y no guardes, registres ni transmitas credenciales al runner, al agente o a reportes. El usuario debe escribirlas directamente en el sitio de destino.
-    -   Tras la confirmación, reutiliza la página/contexto de MCP Playwright donde el usuario autenticó. Si la sesión no está disponible para MCP Playwright, registra el bloqueo de autenticación y no intentes sortearlo.
+    -   Si la página requiere autenticación, usa la sesión que el usuario guardó en el runner: los servidores MCP `playwright-session-*` ya la tienen. El agente corre sin nadie delante, así que no pidas al usuario que inicie sesión ni esperes su confirmación.
+    -   Nunca solicites usuario o contraseña, nunca captures los campos de credenciales, y no guardes, registres ni transmitas credenciales a reportes.
+    -   Si no hay sesión disponible, o el ambiente no responde por VPN, proxy o certificado, registra el bloqueo (`BLOCKED/AUTH_REQUIRED` o `BLOCKED/ENVIRONMENT`) con el detalle y no intentes sortearlo.
     -   Registra URL final, fecha/hora, viewport y cualquier estado de autenticación o carga que limite la cobertura.
 
 2.  **Ejecutar Auditoría Axe**:

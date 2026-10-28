@@ -4,7 +4,7 @@ description: Ejecuta pruebas de navegación en navegador con todas las interacci
 compatibility:
   gemini: ">=2.5.0"
 metadata:
-    version: 1.1.0
+  version: 1.2.0
   author: Gemini
 allowed-tools: "MCP Playwright"
 ---
@@ -24,10 +24,11 @@ Esta habilidad se activa cuando se encuentra una URL en la historia de usuario y
 ## Regla de ejecución
 
 - Ejecuta dentro del agente activo usando únicamente MCP Playwright. No uses shell, CLI, scripts, procesos Playwright externos ni otro agente.
+- Excepción del modo híbrido (`QA_EXECUTION_MODE=playwright`): `tools/qa-runner.mjs` ejecuta el spec con Playwright Test y genera `execution-report.json`. En ese modo no ejecutes los casos tú mismo; solo genera el spec o haz el triage cuando el runner te lo pida.
 - Respeta exactamente `selectedScenarioIds`, `selectedBrowsers` y `selectedTestTypes` del plan. No infieras valores faltantes.
 - Usa solo los navegadores seleccionados; si no hay ninguno definido, usa Chromium. No recorras todos los servidores MCP configurados.
 - Usa las herramientas MCP Playwright disponibles en la sesión. Si falta una capacidad necesaria, marca el caso `BLOCKED` y registra cuál falta; no la sustituyas por shell.
-- Reutiliza la sesión autenticada por el usuario. No solicites ni inventes credenciales; sin sesión, registra `BLOCKED/AUTH_REQUIRED`.
+- Reutiliza la sesión autenticada que guardó el usuario en el runner: los servidores MCP `playwright-session-*` ya tienen esa sesión. No pidas al usuario que inicie sesión durante la ejecución (el agente corre sin nadie delante). Sin sesión disponible, registra `BLOCKED/AUTH_REQUIRED`.
 
 ## Entrada
 
@@ -37,21 +38,24 @@ Esta habilidad se activa cuando se encuentra una URL en la historia de usuario y
 
 ## Pasos
 
-### Presupuesto estricto de ejecución
+### Presupuesto estricto y alto rendimiento de ejecución (No más de 2 minutos sin omitir pruebas)
 
-- El skill completo debe finalizar en un máximo de **115 segundos** desde la primera navegación; reserva los últimos 15 segundos para guardar capturas, JSON y el resumen. No excedas nunca 120 segundos.
-- Usa un único navegador salvo que el usuario o el plan haya seleccionado explícitamente varios. Antes de ejecutar, calcula el presupuesto por caso según escenarios y navegadores seleccionados; distribúyelo para completar la navegación, los casos y las capturas dentro de los primeros 100 segundos.
-- Limita cada navegación a 10 segundos, cada acción a 3 segundos y cada aserción a 2.5 segundos. No uses esperas fijas (`waitForTimeout`) ni esperes `networkidle`; usa `domcontentloaded` y espera únicamente el control o estado requerido.
-- No reintentes automáticamente un caso. Si el presupuesto restante no alcanza para ejecutar y capturar el siguiente caso, detén la ejecución, registra los casos pendientes como `BLOCKED` con motivo `TIME_BUDGET`, y genera el reporte dentro del tiempo reservado. Un límite de tiempo no es un fallo funcional ni debe crear un bug.
-- Prioriza los casos seleccionados en el orden del plan. Evita acciones redundantes, volver a navegar al mismo host si la sesión/página se puede reutilizar y explorar elementos que no forman parte del escenario.
+- **Optimización de Performance:** La ejecución completa de TODOS los escenarios de prueba debe completarse en **menos de 2 minutos (máximo 115 segundos)**, garantizando que **ninguna prueba quede sin ejecutar**.
+- **Reglas clave para lograr la meta de tiempo sin saltar pruebas:**
+  1. Reutilizar la misma instancia/página del navegador entre escenarios siempre que sea posible, evitando recargar todo el DOM desde cero en cada prueba.
+  2. Ajustar los tiempos de espera a valores precisos: navegación máxima 6-8s (`domcontentloaded`), acciones y clics 1.5-2s, aserciones 1.5-2s.
+  3. Prohibido el uso de esperas artificiales (`waitForTimeout`, sleep) o `networkidle`.
+  4. Agrupar verificaciones visuales y capturas al final del paso clave para minimizar el overhead de I/O.
+  5. Asegurar que cada prueba seleccionada sea ejecutada secuencial o concurrentemente dentro del margen de 115s, reservando los últimos 15s para la consolidación de evidencias y generación de reportes.
 
 1.  **Configuración y Navegación**:
     -   Extrae la URL objetivo de la historia de usuario o plan de pruebas.
     -   Abre únicamente los navegadores seleccionados; si no hay selección, usa Chromium.
-    -   Navega con un límite de 10 segundos y espera solo el control requerido, nunca `networkidle`.
+    -   Navega con un límite de 8 segundos y espera solo el control requerido, nunca `networkidle`.
 
 2.  **Autenticación**:
-    -   Reutiliza la sesión autenticada por el usuario. Sin sesión disponible, registra `BLOCKED/AUTH_REQUIRED` y detén los casos que la requieran.
+    -   Al validar el enlace de prueba, verificar de inmediato si la aplicación requiere login.
+    -   Si la página redirige a un formulario de login o requiere credenciales, usa la sesión guardada (servidor MCP `playwright-session-*`) o las credenciales de `.env` indicadas por el runner. Si no hay ninguna, registra los casos como `BLOCKED/AUTH_REQUIRED` y no esperes al usuario.
 
 3.  **Análisis Inicial de Página**:
     -   **Analizar Animaciones:** No esperes pausas fijas. Espera un selector o estado estable concreto con el presupuesto de aserción indicado.
@@ -60,21 +64,21 @@ Esta habilidad se activa cuando se encuentra una URL en la historia de usuario y
 4.  **Ejecutar Escenarios de Prueba**:
     -   Lee y analiza el archivo `{story-id}-plan.json`.
     -   Ejecuta exclusivamente los escenarios enumerados en `selectedScenarioIds`. No ejecutes otros; registra cuántos quedaron omitidos.
-    -   Si un escenario tiene `clarificationRequired: true`, no afirmes como defecto el resultado de una regla no aprobada. Márcalo `BLOCKED/CLARIFICATION_REQUIRED` y explica la pregunta pendiente; solo ejecuta observaciones que no dependan de esa regla y no generes un bug por una expectativa asumida.
+    -   Si un escenario tiene `clarificationRequired: true`, aplica la regla de `GEMINI.md`: ejecútalo con el comportamiento más conservador documentado en la historia, registra la ambigüedad como hallazgo `AMB-NNN` de severidad Low y no generes un bug por una expectativa asumida. Usa `BLOCKED/CLARIFICATION_REQUIRED` solo si el comportamiento esperado es completamente indeterminado.
     -   Para cada escenario de prueba:
         -   Registra el ID del escenario antes de ejecutarlo y realiza sus pasos en el orden definido.
         -   Usa timeout máximo de 3 segundos por acción y 2.5 segundos por aserción. Espera solo el cambio de UI que valida el paso; no combines `networkidle`, `waitForTimeout` y esperas de selector para la misma interacción.
         -   Antes de interactuar, usa un locator específico que coincida con exactamente un elemento. Prioriza rol y nombre accesible exactos; si faltan, inspecciona el DOM y usa el atributo o contenedor visible más específico.
         -   No uses texto parcial genérico, `nth()` ni roles que no hayas comprobado. Si el locator encuentra cero o varios elementos, inspecciona y corrígelo antes de seguir.
         -   Opera los elementos `<select>` con `selectOption`; nunca uses `fill` en una lista desplegable.
-        -   Para specs Playwright ejecutables, fija un timeout máximo de 12 segundos por caso en suites de hasta 10 escenarios; configura además `globalTimeout` en 105 segundos para detener la suite antes de dos minutos. Si el timeout global impide iniciar casos restantes, regístralos como `BLOCKED/TIME_BUDGET`, no como fallos. La suma de casos seleccionados y navegadores nunca debe superar el presupuesto total del skill.
+        -   Para specs Playwright ejecutables, diseña cada caso para terminar en menos de 12 segundos (`playwright.config.ts` corta a los 15 s y reintenta una vez para detectar intermitencias); `globalTimeout` está en 105 segundos para detener la suite antes de dos minutos. Si el timeout global impide iniciar casos restantes, regístralos como `BLOCKED/TIME_BUDGET`, no como fallos. La suma de casos seleccionados y navegadores nunca debe superar el presupuesto total del skill.
         -   Captura una screenshot de página completa al terminar cada escenario ejecutado, tanto si pasa como si falla. En caso de fallo, captura también inmediatamente después del error y antes de continuar o cerrar el navegador.
         -   Guarda las capturas en `3-outputs/run/{story-id}/execution/screenshots/` con nombres estables que incluyan el ID del escenario y, si aplica, navegador e intento (por ejemplo, `SC_001-chromium-attempt-1.png`). No reemplaces evidencia de intentos anteriores.
-        -   En `execution-report.json`, agrega a cada resultado un arreglo `screenshots` con la ruta relativa desde el directorio de la historia, el navegador, el intento y una leyenda que indique el ID del caso y si es evidencia final o de fallo. Cada escenario ejecutado debe tener al menos una captura; cada fallo debe tener una captura tomada en el momento del error.
+        -   En `execution-report.json`, registra en el campo `screenshot` de cada resultado la ruta relativa desde el directorio de la historia de su captura. Cada escenario ejecutado debe tener al menos una captura; cada fallo debe tener una captura tomada en el momento del error.
 
 5.  **Generar Reporte**:
     -   Todos los archivos temporales y evidencia deben crearse dentro del directorio `3-outputs/run/{story-id}/execution/`.
-    -   Crea un archivo único `execution-report.json` resumiendo los resultados (acciones realizadas, hallazgos, estado de cada caso de prueba) y enlazando a evidencia capturada.
+    -   Crea un archivo único `execution-report.json` que cumpla `schemas/execution-report.schema.json`: un elemento en `scenarios` por escenario y navegador, con `status` PASS, FAIL o BLOCKED, `reason` (`BLOCKED/MOTIVO` o null), `error` y `screenshot`, y `summary` con totales que coincidan. No inventes otro formato: el runner lo valida.
     - si hay fallos documentarlos en el reporte de ejecución para que el orquestador pueda decidir ejecutar `report-bugs`.
 
 ## Salida

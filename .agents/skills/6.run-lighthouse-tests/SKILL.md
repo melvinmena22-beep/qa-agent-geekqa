@@ -1,12 +1,12 @@
 ---
 name: run-lighthouse-tests
-description: Ejecuta una auditoría Lighthouse para rendimiento, accesibilidad y SEO.
+description: Ejecuta una auditoría Lighthouse para rendimiento, accesibilidad, buenas prácticas y SEO, con varias corridas y umbrales de aprobación.
 compatibility:
   gemini: ">=2.5.0"
 metadata:
-  version: 1.1.0
+  version: 2.0.0
   author: Gemini
-allowed-tools: "MCP Playwright", "lighthouse performance analysis", "run_shell_command"
+allowed-tools: "MCP Playwright, run_shell_command (solo npx -y lighthouse@12.2.1)"
 ---
 # Habilidad: Ejecutar Pruebas Lighthouse
 
@@ -14,42 +14,87 @@ allowed-tools: "MCP Playwright", "lighthouse performance analysis", "run_shell_c
 
 ## Cuándo Usar
 
-Usa esta habilidad para auditar una página web para métricas de rendimiento, accesibilidad, mejores prácticas y SEO.
+Usa esta habilidad para auditar una página web en rendimiento, accesibilidad, buenas prácticas y SEO, con un resultado PASS o FAIL según umbrales definidos.
 
 ## Entrada
 
-- **Plan de Pruebas:** El archivo `{story-id}-plan.json`, que contiene la URL objetivo.
+- **Plan de Pruebas:** El archivo `{story-id}-plan.json`, que contiene la URL objetivo y, opcionalmente, `performanceBudgets`.
+
+## Reglas
+
+- Usa siempre la versión fijada: `npx -y lighthouse@12.2.1`. No uses `lighthouse` sin versión ni `@latest`: los puntajes cambian entre versiones y dejarían de ser comparables.
+- Una sola corrida no es fiable (el puntaje de rendimiento varía varios puntos entre corridas). Haz **3 corridas por dispositivo** y usa la **mediana**.
+- Audita dos dispositivos: `mobile` (configuración por defecto) y `desktop` (`--preset=desktop`).
+- Si la página exige login, Lighthouse no puede reutilizar la sesión del runner: registra `BLOCKED/AUTH_REQUIRED` en el resumen y no audites la pantalla de login en su lugar.
+- El agente corre sin nadie delante: no pidas confirmaciones al usuario.
+
+## Umbrales (performanceBudgets)
+
+Si el plan no define `performanceBudgets`, usa estos mínimos sobre la mediana (puntaje de 0 a 1):
+
+| Categoría | Mínimo |
+|---|---|
+| performance | 0.80 |
+| accessibility | 0.90 |
+| best-practices | 0.90 |
+| seo | 0.80 |
+
+Una categoría por debajo del mínimo en cualquier dispositivo hace que el estado global sea `FAIL`.
 
 ## Pasos
 
-1.  **Configuración y Navegación**:
-    -   Extrae la URL objetivo del plan de pruebas.
-    -   Lanza una instancia de navegador Playwright y navega a la URL.
-    -   Si la página requiere Google Sign-In, usa las variables de entorno para iniciar sesión.
+1.  **Preparación**:
+    -   Extrae la URL objetivo del plan. Si falta o no es válida, registra el bloqueo y no inventes una URL.
+    -   Crea `3-outputs/run/{story-id}/lighthouse/raw/`. Todos los archivos, incluidos temporales, van dentro de `3-outputs/run/{story-id}/lighthouse/`.
 
-2.  **Ejecutar Auditoría Lighthouse**:
-    -   Ejecuta la auditoría Lighthouse contra el estado actual de la página usando la API programática (ej. `playwright-lighthouse`).
-    -   Configúrala para ejecutar las categorías de rendimiento, accesibilidad, mejores prácticas y SEO.
+2.  **Corridas** (3 por dispositivo):
+    -   Mobile: `npx -y lighthouse@12.2.1 {url} --quiet --chrome-flags="--headless=new" --output=json --output=html --output-path=3-outputs/run/{story-id}/lighthouse/raw/{story-id}-mobile-run{n}`
+    -   Desktop: el mismo comando con `--preset=desktop` y el nombre `{story-id}-desktop-run{n}`.
+    -   Si una corrida falla, reintenta una vez; si vuelve a fallar, registra el error y continúa con las demás.
 
-3.  **Generar Reporte**:
-    -   Todos los archivos temporales, incluyendo cualquier archivo de configuración, deben crearse dentro del directorio `3-outputs/run/{story-id}/lighthouse/`.
-    -   Guarda la salida JSON cruda de Lighthouse a un archivo `{story-id}-report.json`.
-    -   Opcionalmente, crea un reporte HTML más legible por humanos también.
+3.  **Consolidar**:
+    -   Por dispositivo, calcula la mediana de cada categoría y elige como corrida representativa la de rendimiento mediano.
+    -   Compara cada mediana con su umbral.
+    -   Escribe el resumen `{story-id}-lighthouse.json`. El reporte final enlaza el HTML de la corrida representativa (`raw/{story-id}-mobile-run{n}.report.html`); no copies archivos con la shell.
 
 ## Salida
 
--   **Reporte JSON:** `3-outputs/run/{story-id}/lighthouse/{story-id}-report.json`.
--   **Reporte HTML (Opcional):** `3-outputs/run/{story-id}/lighthouse/{story-id}-report.html`.
+-   **Resumen:** `3-outputs/run/{story-id}/lighthouse/{story-id}-lighthouse.json`, con este formato:
+
+```json
+{
+  "storyId": "US-79",
+  "url": "https://...",
+  "lighthouseVersion": "12.2.1",
+  "runsPerDevice": 3,
+  "budgets": { "performance": 0.8, "accessibility": 0.9, "best-practices": 0.9, "seo": 0.8 },
+  "devices": {
+    "mobile": {
+      "median": { "performance": 0.82, "accessibility": 0.9, "best-practices": 1, "seo": 0.83 },
+      "runs": [{ "file": "raw/US-79-mobile-run1.report.json", "performance": 0.8 }],
+      "representativeRun": "raw/US-79-mobile-run2.report.json",
+      "failedCategories": []
+    },
+    "desktop": { "median": {}, "runs": [], "representativeRun": null, "failedCategories": [] }
+  },
+  "status": "PASS | FAIL | BLOCKED",
+  "reason": null
+}
+```
+
+-   **Corridas crudas (JSON y HTML):** `3-outputs/run/{story-id}/lighthouse/raw/`; el HTML de referencia es el de `representativeRun`.
 
 ## Criterios de Finalización
 
-- ✅ La auditoría Lighthouse se completa exitosamente.
-- ✅ Un reporte JSON es generado en el directorio de salida `lighthouse`.
+- ✅ Se completaron 3 corridas por dispositivo (o se registró por qué no).
+- ✅ `{story-id}-lighthouse.json` contiene las medianas, los umbrales y el estado PASS/FAIL.
+- ✅ El reporte final cita las medianas, no una corrida aislada.
 
 ## Si Falla
 
 | Problema | Acción |
 |----------|--------|
-| Lighthouse no instalado | Registrar un error y detener. Asegúrate de que Lighthouse sea una dependencia del proyecto. |
-| Página inalcanzable | Registrar el error y marcar la habilidad como OMITIDA. |
-| Auditoría se agota | Aumentar la configuración de timeout y reintentar. |
+| `npx` no puede descargar Lighthouse | Registrar `BLOCKED/ENVIRONMENT` con el error y detener la habilidad. |
+| No hay Chrome instalado | Registrar `BLOCKED/ENVIRONMENT` e indicar que se instale Chrome o se defina `CHROME_PATH`. |
+| Página inalcanzable | Registrar el error y marcar la habilidad como `BLOCKED`. |
+| La página exige login | Registrar `BLOCKED/AUTH_REQUIRED`; no auditar la pantalla de login como si fuera la funcionalidad. |

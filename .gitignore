@@ -2,3 +2,11 @@
 .env
 .env.*
 !.env.example
+# Sesiones guardadas con tools/save-session.mjs (contienen cookies de login)
+.auth/
+# Capturas, snapshots y logs del MCP de Playwright: pueden contener datos de aplicaciones internas.
+.playwright-mcp/
+test-results/
+# Scripts antiguos sin uso, fuera del repositorio (se pueden borrar).
+_legacy/
+node_modules/

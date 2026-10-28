@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "@playwright/test": "^1.63.0"
+  },
+  "scripts": {
+    "start": "node tools/runner-supervisor.mjs",
+    "test": "node --test tools/tests/*.test.mjs"
   }
 }

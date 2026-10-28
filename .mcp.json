@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "playwright-chromium": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.83",
+        "--isolated"
+      ]
+    },
+    "playwright-firefox": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.83",
+        "--browser",
+        "firefox",
+        "--isolated"
+      ]
+    },
+    "playwright-webkit": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.83",
+        "--browser",
+        "webkit",
+        "--isolated"
+      ]
+    },
+    "azure-devops": {
+      "command": "node",
+      "args": [
+        "tools/azure-devops-importer.mjs"
+      ],
+      "env": {
+        "AZDO_ORG_URL": "https://dev.azure.com/GSID-Autogestion",
+        "AZDO_PROJECT": "Pruebas-TI IA"
+      }
+    },
+    "graphify": {
+      "type": "http",
+      "url": "https://api.graphify.com/mcp"
+    }
+  }
+}

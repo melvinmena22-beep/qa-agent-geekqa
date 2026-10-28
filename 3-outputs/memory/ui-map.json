@@ -39,11 +39,11 @@
         },
         {
           "name": "Campo Carrera",
-          "role": "combobox|select",
-          "locator": "DESCONOCIDO — NO es input[type=text]",
-          "type": "dropdown/select/combobox",
-          "status": "PROBLEMA-SELECTOR",
-          "notes": "IMPORTANTE: No es un <input type='text'>. El spec .nth(2) falla con timeout. Inspeccionar manualmente para determinar el selector correcto. Posibles: getByRole('combobox'), select[name='carrera'], o componente UI customizado."
+          "role": "combobox",
+          "locator": "form label 'Carrera' → xpath=.. → select; selectOption({label})",
+          "type": "select (nativo)",
+          "status": "confirmed-working",
+          "notes": "Select nativo; excluir placeholder \"Seleccione carrera\". Verificado 2026-10-21."
         },
         {
           "name": "Campo Contacto",
@@ -69,8 +69,8 @@
         {
           "name": "Buscador del módulo Estudiantes",
           "role": "textbox",
-          "locator": "getByRole('textbox', { name: 'Buscar por nombre o documento' }) | input[placeholder='Buscar por nombre o documento...']",
-          "status": "PROBLEMA-SELECTOR",
+          "locator": "getByPlaceholder('Buscar por nombre o documento...', { exact: true })",
+          "status": "confirmed-working",
           "notes": "USAR ESTE SELECTOR ESPECÍFICO. No usar input[placeholder*='Buscar'] porque hay 2 inputs que coinciden (buscador global + buscador del módulo)."
         },
         {

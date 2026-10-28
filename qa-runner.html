@@ -1,10 +1,10 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Test Executor &amp; Automator | Pruebas TI</title>
-  <link rel="icon" href="/grupo-sid-logo.svg" type="image/svg+xml">
+  <link rel="icon" href="/test-executor-logo.png" type="image/png">
   <style>
     :root {
       --bg: #edf6f4;
@@ -35,7 +35,7 @@
     [hidden] { display: none !important; }
     .topbar { position: sticky; z-index: 5; top: 0; display: grid; grid-template-columns: minmax(210px, 1fr) auto minmax(145px, 1fr); align-items: center; gap: 18px; min-height: 64px; padding: 9px 20px; border-bottom: 1px solid var(--line); background: linear-gradient(90deg, rgba(8,52,45,0.98), rgba(11,44,78,0.96)); box-shadow: 0 8px 18px rgba(10,31,41,0.08); }
     .brand-lockup { display: flex; min-width: 0; align-items: center; gap: 12px; }
-    .brand { width: 110px; height: auto; max-height: 38px; object-fit: contain; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.15)); }
+    .brand { width: 46px; height: 46px; max-height: 46px; object-fit: contain; border-radius: 10px; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.15)); }
     .brand-title { min-width: 0; }
     .brand-title strong { display: block; color: #edf8ff; font-size: 13px; line-height: 1.25; }
     .eyebrow { display: flex; align-items: center; gap: 7px; margin-bottom: 2px; color: #d5f6e5; font-size: 10px; font-weight: 900; letter-spacing: .08em; }
@@ -145,26 +145,71 @@
     .footer-actions { margin-left: auto; }
     #run-reviewed { width: auto; min-height: 32px; padding: 7px 12px; border-radius: 6px; background: linear-gradient(135deg, #1e9a74, #105d89); font-size: 8px; white-space: nowrap; color: #fff; }
     #run-reviewed:hover:not(:disabled) { background: linear-gradient(135deg, #1b876c, #0f4f7d); }
-    #status { position: fixed; z-index: 8; right: 18px; bottom: 70px; width: min(440px, calc(100vw - 36px)); margin: 0; padding: 10px 12px; border-radius: 7px; box-shadow: 0 8px 25px rgba(13,44,79,0.12); }
+    #status { position: fixed; z-index: 9999; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(520px, calc(100vw - 40px)); margin: 0; padding: 22px 28px; border-radius: 14px; box-shadow: 0 15px 45px rgba(10,31,41,0.35); text-align: center; font-size: 15px; font-weight: 700; background: #ffffff; border: 2px solid var(--green-700); }
+    #status::before { content: ""; position: fixed; inset: -100vh; background: rgba(10,31,41,0.45); z-index: -1; backdrop-filter: blur(2px); }
+    #status a { display: inline-block; margin-top: 12px; padding: 8px 18px; border-radius: 6px; background: var(--green-700); color: #fff; text-decoration: none; font-weight: 800; }
+    #status a:hover { background: var(--green-900); }
     .footer { display: none; }
     @media (max-width: 950px) { .test-type-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); } .test-type-heading { grid-column: 1 / -1; } }
     @media (max-width: 950px) { .topbar { grid-template-columns: minmax(170px, 1fr) auto; } .stepper { grid-column: 1 / -1; grid-row: 2; justify-self: center; } .ado-sync { grid-column: 2; grid-row: 1; } .board-grid { grid-template-columns: minmax(0, 1.5fr) minmax(240px, .9fr); } .table-head, .scenario-row { grid-template-columns: 18px minmax(105px, 1.5fr) 65px minmax(70px, 1fr) 70px; } .table-head > :nth-child(5), .scenario-row > :nth-child(5) { display: none; } }
     @media (max-width: 680px) { body { padding-bottom: 132px; } .topbar { position: static; grid-template-columns: 1fr auto; gap: 8px; padding: 9px 11px; } .stepper { width: 100%; justify-content: center; gap: 3px; overflow: auto; } .step-item { padding: 5px 6px; font-size: 7px; } .ado-sync { font-size: 7px; } .workspace { padding: 9px; } .setup { margin: 12px 0; padding: 14px; } .setup-form { grid-template-columns: 1fr; } .environment-card { align-items: flex-start; flex-direction: column; padding: 11px; } .env-actions { align-self: stretch; } .env-actions button { flex: 1; } .host-line a { max-width: 65vw; } .test-type-picker { grid-template-columns: 1fr; } .test-type-heading { grid-column: auto; } .board-grid { grid-template-columns: 1fr; } .scenario-panel { min-height: 400px; } .detail-panel { min-height: 260px; } .panel-head { align-items: flex-start; flex-direction: column; } .search-box { width: 100%; } .scenario-filters { flex-wrap: wrap; } .table-head, .scenario-row { grid-template-columns: 17px minmax(98px, 1fr) 59px 74px; gap: 5px; padding-right: 7px; padding-left: 7px; } .table-head > :nth-child(4), .scenario-row > :nth-child(4), .table-head > :nth-child(5), .scenario-row > :nth-child(5) { display: none; } .board-footer { min-height: 122px; align-items: flex-start; flex-direction: column; gap: 6px; padding: 7px 9px; } .footer-selection { min-width: 0; } .footer-actions { width: 100%; } .footer-actions button { flex: 1; } #run-reviewed { flex: 1.2; } #status { right: 9px; bottom: 130px; width: calc(100vw - 18px); } }
     @media (max-width: 680px) { .step-item, .ado-sync { font-size: 8px; } }
+
+    #status { cursor: pointer; }
+    #status::after { content: "Clic o Esc para cerrar"; display: block; margin-top: 10px; color: var(--text-muted); font-size: 11px; font-weight: 500; }
+    .login-panel { display: grid; gap: 7px; margin-top: 4px; padding: 9px 11px; border: 1px solid #f0d9a8; border-radius: 7px; background: #fffaf0; }
+    .login-panel:has(.login-status.ok) { border-color: #b8ded8; background: #eef7f5; }
+    .login-status { margin: 0; color: var(--warning); font-size: 10px; font-weight: 700; line-height: 1.4; }
+    .login-status.ok { color: var(--success); }
+    .credentials-form { display: flex; flex-wrap: wrap; gap: 6px; }
+    .credentials-form input { flex: 1 1 160px; min-width: 0; margin: 0; padding: 7px 9px; border: 1px solid #cfe3db; border-radius: 6px; background: #fff; font-size: 10px; }
+    .login-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .login-dialog { width: min(520px, calc(100vw - 32px)); padding: 0; border: 0; border-radius: 12px; box-shadow: 0 24px 60px #17202a40; }
+    .login-dialog::backdrop { background: #17202a73; }
+    .login-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 16px 18px; background: #173b4d; color: #fff; }
+    .login-dialog-header h2 { margin: 0; color: #fff; font-size: 16px; }
+    .login-dialog-header p { margin: 4px 0 0; color: #cfe3ea; font-size: 12px; line-height: 1.4; }
+    .login-dialog-close { border: 0; background: transparent; color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+    .login-dialog-body { display: grid; gap: 10px; padding: 14px 18px 18px; }
+    .login-dialog-body .login-panel { margin: 0; }
+    .login-dialog-body .credentials-form input, .login-dialog-body .login-status, .login-dialog-body .credential-note { font-size: 12px; }
+    .input-request { display: grid; gap: 6px; padding: 10px 12px; border: 1px solid #f0d9a8; border-radius: 8px; background: #fffaf0; }
+    .input-request.provided { border-color: #b8ded8; background: #eef7f5; }
+    .input-request h3 { margin: 0; font-size: 13px; color: #17202a; }
+    .input-request p { margin: 0; color: #5b6870; font-size: 11px; line-height: 1.4; }
+    .input-request .input-cases { color: #173b4d; font-weight: 700; }
+    .input-request .input-fields { display: flex; flex-wrap: wrap; gap: 6px; }
+    .input-request input, .input-request textarea { flex: 1 1 180px; min-width: 0; margin: 0; padding: 7px 9px; border: 1px solid #cfe3db; border-radius: 6px; background: #fff; font: inherit; font-size: 12px; }
+    .input-request textarea { min-height: 54px; resize: vertical; }
+    .input-request .input-error { color: #b00020; font-weight: 700; }
+    .inputs-actions { position: sticky; bottom: 0; display: flex; justify-content: flex-end; gap: 8px; margin: 0 -18px -18px; padding: 10px 18px; border-top: 1px solid #e3e8ea; background: #fff; }
   </style>
 </head>
 <body>
   <main>
     <header class="topbar">
       <div class="brand-lockup">
-        <img class="brand" src="/grupo-sid-logo.svg?v=2" alt="Grupo SID">
+        <img class="brand" src="/test-executor-logo.png?v=1" alt="Test Executor &amp; Automator">
         <div class="brand-title">
           <div class="eyebrow">Pruebas TI <span class="version">v2.4</span></div>
           <strong>Test Executor &amp; Automator</strong>
         </div>
       </div>
       <nav class="stepper" aria-label="Progreso de ejecución"><span id="step-connection" class="step-item active"><span class="step-number">1</span> Conexión &amp; Ambiente</span><span class="step-chevron">›</span><span id="step-cases" class="step-item"><span class="step-number">2</span> Selección de Casos</span><span class="step-chevron">›</span><span id="step-execution" class="step-item"><span class="step-number">3</span> Ejecución &amp; Resultados</span></nav>
-      <div class="ado-sync"><span class="sync-dot"></span>Sync activo con DevOps</div>
+      <div class="ado-sync" style="display:flex;align-items:center;gap:10px;">
+        <span><span class="sync-dot"></span>Sync activo con DevOps</span>
+        <button id="save-report"
+          title="Guardar informe como HTML"
+          style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid rgba(255,255,255,0.25);border-radius:6px;background:rgba(255,255,255,0.10);color:#dffcf3;font-size:10px;font-weight:700;cursor:pointer;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Guardar informe
+        </button>
+      </div>
     </header>
     <div class="workspace">
       <section id="setup" class="setup">
@@ -176,7 +221,7 @@
         </form>
       </section>
       <section id="review" class="review" hidden aria-live="polite">
-        <div class="environment-card"><div class="environment-main"><div class="story-line"><span id="story-id" class="story-id">▤ US-—</span><span id="project-name" class="story-name">Proyecto pendiente</span></div><div class="host-line"><span class="host-label">Host de pruebas:</span><a id="test-link" target="_blank" rel="noopener noreferrer">Sin validar</a><span id="health-state" class="health-pill warning"><span class="live-dot"></span><span id="access-state">Esperando validación</span></span></div><a id="manual-login" class="manual-login" target="_blank" rel="noopener noreferrer" hidden>Abrir portal para iniciar sesión ↗</a><p id="credential-note" class="credential-note" hidden>Ingresa tus credenciales directamente en el portal; no las compartas con el QA Runner.</p></div><div class="env-actions"><button id="edit-variables" class="quiet-button" type="button">⚙ Editar variables</button></div></div>
+        <div class="environment-card"><div class="environment-main"><div class="story-line"><span id="story-id" class="story-id">▤ US-—</span><span id="project-name" class="story-name">Proyecto pendiente</span></div><div class="host-line"><span class="host-label">Host de pruebas:</span><a id="test-link" target="_blank" rel="noopener noreferrer">Sin validar</a><span id="health-state" class="health-pill warning"><span class="live-dot"></span><span id="access-state">Esperando validación</span></span></div><a id="manual-login" class="manual-login" target="_blank" rel="noopener noreferrer" hidden>Abrir portal para iniciar sesión ↗</a><p id="credential-note" class="credential-note" hidden>Ingresa tus credenciales directamente en el portal; no las compartas con el QA Runner.</p><div id="login-panel" class="login-panel" hidden><p id="login-status" class="login-status" role="status"></p><form id="credentials-form" class="credentials-form" autocomplete="off"><input id="login-username" type="text" placeholder="Usuario o correo de prueba" autocomplete="off" aria-label="Usuario o correo de prueba"><input id="login-password" type="password" placeholder="Contraseña" autocomplete="new-password" aria-label="Contraseña"><button class="quiet-button" type="submit">Validar y guardar</button></form><div class="login-actions"><button id="interactive-login" class="quiet-button" type="button">🌐 Iniciar sesión en el navegador (SSO/MFA)</button><button id="confirm-login" class="primary-button" type="button" hidden>✔ Ya inicié sesión</button><button id="clear-credentials" class="quiet-button" type="button" hidden>Cerrar sesión guardada</button></div><p id="login-evidence" class="credential-note" hidden></p></div></div><div class="env-actions"><button id="edit-variables" class="quiet-button" type="button">⚙ Editar variables</button></div></div>
         <section class="test-type-picker" aria-labelledby="test-type-title"><div class="test-type-heading"><strong id="test-type-title">Modalidades de prueba</strong><span>Elige una o más auditorías para esta ejecución.</span></div><label class="test-type-option"><input type="checkbox" name="test-type" value="functional" checked>Funcionales · casos seleccionados</label><label class="test-type-option"><input type="checkbox" name="test-type" value="accessibility">Accesibilidad · WCAG 2.1 AA</label><label class="test-type-option"><input type="checkbox" name="test-type" value="performance">Rendimiento · Lighthouse</label></section>
         <div class="board-grid">
           <section class="scenario-panel" aria-label="Escenarios disponibles"><div class="panel-head"><div class="panel-title">Escenarios disponibles <span id="scenario-count" class="case-count"></span></div><input id="filter-search" class="search-box" type="search" placeholder="⌕ Filtrar por ID, título o técnica..."></div><div id="quick-filters" class="filter-row" aria-label="Filtros rápidos"></div><div class="scenario-filters" aria-label="Filtros adicionales"><label for="filter-severity">Severidad<select id="filter-severity"><option value="all">Todas</option></select></label><label for="filter-type">Clasificación<select id="filter-type"><option value="all">Todas</option></select></label><label for="filter-polarity">Polaridad<select id="filter-polarity"><option value="all">Ambas</option><option value="Positivo">Positivos</option><option value="Negativo">Negativos</option><option value="Sin clasificar">Sin clasificar</option></select></label></div><div class="table-head" role="row"><input id="select-visible" type="checkbox" aria-label="Seleccionar casos visibles"><span>ID / Escenario</span><span>Severidad</span><span>Técnica ISTQB</span><span>Clasificación</span><span>Automatización</span></div><div id="scenario-list" class="scenario-list" role="list" aria-label="Lista de casos de prueba"></div></section>
@@ -185,9 +230,17 @@
         <section class="techniques" aria-labelledby="techniques-title"><h3 id="techniques-title">Técnicas ISTQB aplicables</h3><ul id="technique-list"></ul></section>
       </section>
     </div>
-    <div class="board-footer" id="board-footer" hidden><div class="footer-selection"><span class="selected-dot"></span><strong id="selection-count">0 casos seleccionados</strong><span class="footer-separator"></span><span id="estimate" class="estimate">Tiempo estimado: —</span></div><div class="browser-group" aria-label="Navegadores seleccionados para pruebas funcionales"><span class="browser-label">Navegadores funcionales:</span><label class="browser-option"><input type="checkbox" name="browser" value="chromium" checked>Chromium</label><label class="browser-option"><input type="checkbox" name="browser" value="firefox">Firefox</label><label class="browser-option"><input type="checkbox" name="browser" value="webkit">WebKit</label></div><div class="footer-actions"><button id="run-reviewed" class="primary-button" type="button" disabled>▶ Ejecutar pruebas</button></div></div>
+    <div class="board-footer" id="board-footer" hidden><div class="footer-selection"><span class="selected-dot"></span><strong id="selection-count">0 casos seleccionados</strong><span class="footer-separator"></span><span id="estimate" class="estimate">Tiempo estimado: —</span></div><div class="browser-group" aria-label="Navegadores seleccionados para pruebas funcionales"><span class="browser-label">Navegadores funcionales:</span><label class="browser-option"><input type="checkbox" name="browser" value="chromium" checked>Chromium</label><label class="browser-option"><input type="checkbox" name="browser" value="firefox">Firefox</label><label class="browser-option"><input type="checkbox" name="browser" value="webkit">WebKit</label></div><label class="browser-option" title="Claude vuelve a inspeccionar la aplicación y reescribe el script Playwright (úsalo tras guardar una sesión o si la aplicación cambió). Tarda varios minutos."><input type="checkbox" id="regenerate-spec">↻ Regenerar script</label><div class="footer-actions"><button id="run-reviewed" class="primary-button" type="button" disabled>▶ Ejecutar pruebas</button></div></div>
     <div id="status" hidden role="status" aria-live="polite"></div>
   </main>
+  <dialog id="login-dialog" class="login-dialog" aria-labelledby="login-dialog-title">
+    <div class="login-dialog-header"><div><h2 id="login-dialog-title">Inicia sesión para continuar</h2><p><span id="login-dialog-story">Esta historia</span> prueba una aplicación con login. Valida un usuario de prueba y después se generarán los casos.</p></div><button id="login-dialog-close" class="login-dialog-close" type="button" aria-label="Cerrar">×</button></div>
+    <div id="login-dialog-body" class="login-dialog-body"></div>
+  </dialog>
+  <dialog id="inputs-dialog" class="login-dialog" aria-labelledby="inputs-dialog-title">
+    <div class="login-dialog-header"><div><h2 id="inputs-dialog-title">La prueba necesita datos</h2><p><span id="inputs-dialog-story">Esta historia</span> tiene casos bloqueados por datos que solo tú puedes aportar. Al guardarlos, esos casos se adaptan y se repiten automáticamente.</p></div><button id="inputs-dialog-close" class="login-dialog-close" type="button" aria-label="Cerrar">×</button></div>
+    <form id="inputs-form" class="login-dialog-body" autocomplete="off"><div id="inputs-list" class="login-dialog-body" style="padding:0"></div><div class="inputs-actions"><button id="inputs-later" class="quiet-button" type="button">Ahora no</button><button class="primary-button" type="submit">Guardar y continuar la prueba</button></div></form>
+  </dialog>
   <script>
     const form = document.querySelector('#run-form');
     const setup = document.querySelector('#setup');
@@ -215,6 +268,8 @@
     let currentPlan = null;
     let activeQuickFilter = 'all';
     function show(message, error = false) { status.hidden = false; status.className = error ? 'error' : ''; status.textContent = message; }
+    // El aviso es modal: se cierra con un clic o con Esc para no bloquear la página.
+    status.addEventListener('click', event => { if (event.target.tagName !== 'A') status.hidden = true; }); document.addEventListener('keydown', event => { if (event.key === 'Escape') status.hidden = true; });
     function setStage(stage) { [[stepConnection, 1], [stepCases, 2], [stepExecution, 3]].forEach(([item, number]) => { item.classList.toggle('active', number === stage); item.classList.toggle('complete', number < stage); }); }
     function setBusy(value) { busy = value; prepareButton.disabled = value; updateSelection(); }
     function getCaseId(scenario, index) { return scenario.id || `SC_${String(index + 1).padStart(3, '0')}`; }
@@ -235,14 +290,160 @@
       const steps = buildSteps(scenario);
       if (steps.length) { const section = document.createElement('section'); section.className = 'detail-section'; const heading = document.createElement('h4'); heading.textContent = 'Pasos de ejecución (Test Steps)'; const list = document.createElement('ol'); steps.forEach(step => { const li = document.createElement('li'); li.textContent = step; list.append(li); }); section.append(heading, list); selectedDetail.append(section); }
       const expected = document.createElement('section'); expected.className = 'detail-section detail-callout'; const expectedHeading = document.createElement('h4'); expectedHeading.textContent = 'Resultado esperado (Assertion)'; const expectedText = document.createElement('p'); expectedText.textContent = scenario.expectedResult || 'No definido en el plan; requiere aclaración.'; expected.append(expectedHeading, expectedText); selectedDetail.append(expected);
-      addDetail(selectedDetail, 'Impacto', scenario.severityRationale); addDetail(selectedDetail, 'Técnica ISTQB', scenario.technique);
+      addDetail(selectedDetail, 'Impacto', scenario.severityRationale); addDetail(selectedDetail, 'Técnica ISTQB', scenario.technique); addDetail(selectedDetail, 'Error anticipado (adivinación de errores)', scenario.errorGuessingRisk);
     }
+    let currentLogin = null;
+    const loginPanel = document.querySelector('#login-panel');
+    const loginDialog = document.querySelector('#login-dialog');
+    const inputsDialog = document.querySelector('#inputs-dialog');
+    let pendingInputsStory = null;
+    function renderInputRequests(id, inputs, errors = {}) {
+      const list = document.querySelector('#inputs-list'); list.replaceChildren();
+      for (const input of inputs) {
+        const box = document.createElement('fieldset'); box.className = `input-request${input.provided ? ' provided' : ''}`; box.dataset.name = input.name; box.dataset.type = input.type;
+        const title = document.createElement('h3'); title.textContent = input.label;
+        const cases = document.createElement('p'); cases.innerHTML = '<span class="input-cases"></span>'; cases.firstChild.textContent = `Casos: ${input.scenarios.join(', ')}`;
+        const help = document.createElement('p'); help.textContent = input.provided ? `Ya aportado${input.type === 'credentials' ? ' (sesión iniciada)' : ''}; el caso sigue bloqueado: puedes corregirlo.` : input.description;
+        const fields = document.createElement('div'); fields.className = 'input-fields';
+        if (input.type === 'credentials') {
+          const user = document.createElement('input'); user.name = 'username'; user.placeholder = 'Usuario o correo'; user.autocomplete = 'off'; user.setAttribute('aria-label', `Usuario para: ${input.label}`); user.value = input.username || '';
+          const pass = document.createElement('input'); pass.name = 'password'; pass.type = 'password'; pass.placeholder = 'Contraseña'; pass.autocomplete = 'new-password'; pass.setAttribute('aria-label', `Contraseña para: ${input.label}`);
+          fields.append(user, pass);
+        } else {
+          const value = document.createElement('textarea'); value.name = 'value'; value.placeholder = 'Escribe el dato solicitado'; value.setAttribute('aria-label', input.label); fields.append(value);
+        }
+        box.append(title, cases, help, fields);
+        if (errors[input.name]) { const error = document.createElement('p'); error.className = 'input-error'; error.textContent = errors[input.name]; box.append(error); }
+        list.append(box);
+      }
+      document.querySelector('#inputs-dialog-story').textContent = `US-${id}`;
+    }
+    async function checkPendingInputs(id) {
+      const data = await fetch(`/api/inputs/${id}`).then(response => response.json()).catch(() => null);
+      if (!data?.inputs?.length) return;
+      pendingInputsStory = { id, inputs: data.inputs };
+      renderInputRequests(id, data.inputs);
+      if (!inputsDialog.open) inputsDialog.showModal();
+      inputsDialog.querySelector('input, textarea')?.focus();
+    }
+    const closeInputsDialog = () => { if (inputsDialog.open) inputsDialog.close(); };
+    document.querySelector('#inputs-dialog-close').addEventListener('click', closeInputsDialog);
+    document.querySelector('#inputs-later').addEventListener('click', closeInputsDialog);
+    document.querySelector('#inputs-form').addEventListener('submit', async event => {
+      event.preventDefault(); if (!pendingInputsStory) return;
+      const { id, inputs } = pendingInputsStory; const values = {};
+      for (const box of document.querySelectorAll('#inputs-list .input-request')) {
+        values[box.dataset.name] = box.dataset.type === 'credentials'
+          ? { username: box.querySelector('[name=username]').value, password: box.querySelector('[name=password]').value }
+          : { value: box.querySelector('[name=value]').value };
+      }
+      const submit = event.submitter; submit.disabled = true; submit.textContent = 'Validando…';
+      const response = await fetch('/api/inputs', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, values }) }).catch(() => null);
+      const data = response ? await response.json().catch(() => ({})) : { message: 'No se pudo conectar con el QA Runner.' };
+      submit.disabled = false; submit.textContent = 'Guardar y continuar la prueba';
+      if (!response?.ok) { if (data.errors) renderInputRequests(id, inputs, data.errors); show(data.message || 'No se pudieron guardar los datos.', true); return; }
+      closeInputsDialog(); setBusy(true); setStage(3); show(data.message || 'Datos guardados. Continuando la prueba…'); runStartedAt = Date.now() - 2000; pollRun(id);
+    });
+    const loginPanelHome = loginPanel.parentElement; const loginPanelNext = loginPanel.nextSibling;
+    function openLoginDialog(data, id) {
+      document.querySelector('#login-dialog-story').textContent = `US-${id}`;
+      document.querySelector('#login-dialog-body').append(loginPanel);
+      renderLogin(data.access.login, id, data.access.url);
+      if (!loginDialog.open) loginDialog.showModal();
+      document.querySelector('#login-username')?.focus();
+    }
+    function closeLoginDialog() {
+      loginPanelHome.insertBefore(loginPanel, loginPanelNext);
+      if (loginDialog.open) loginDialog.close();
+    }
+    function cancelLoginDialog() {
+      closeLoginDialog(); setBusy(false);
+      show('Para generar y ejecutar los casos de esta historia necesitas un usuario válido de la aplicación.', true);
+    }
+    document.querySelector('#login-dialog-close').addEventListener('click', cancelLoginDialog);
+    loginDialog.addEventListener('cancel', event => { event.preventDefault(); cancelLoginDialog(); });
+    // Muestra si la URL exige login y el estado de las credenciales guardadas para la historia.
+    function renderLogin(login, id, url) {
+      currentLogin = { ...(currentLogin && loginPanel.dataset.id === String(id) ? currentLogin : {}), ...(login || {}) };
+      loginPanel.dataset.id = id; loginPanel.dataset.url = url;
+      const required = Boolean(currentLogin.requiresLogin); const ready = Boolean(currentLogin.ready);
+      loginPanel.hidden = !required && !ready;
+      if (loginPanel.hidden) return;
+      const state = document.querySelector('#login-status');
+      state.className = `login-status${ready ? ' ok' : ''}`;
+      state.textContent = ready
+        ? `✔ Sesión iniciada${currentLogin.username ? ` como ${currentLogin.username}` : ''}. El usuario y la contraseña no se guardan; si la sesión caduca, se te pedirá iniciar sesión de nuevo.`
+        : currentLogin.loginType === 'sso'
+          ? '🔒 Esta aplicación requiere iniciar sesión. Ingresa un usuario y contraseña de prueba; si solo admite cuenta corporativa (SSO/MFA), usa "Iniciar sesión en el navegador".'
+          : '🔒 Esta aplicación requiere iniciar sesión. Las pruebas no se ejecutan hasta guardar un usuario y contraseña válidos: se validan iniciando sesión antes de guardarlos.';
+      // El formulario de usuario y contraseña se muestra siempre; el inicio de sesión en el navegador queda como alternativa para SSO/MFA.
+      document.querySelector('#credentials-form').hidden = false;
+      document.querySelector('#clear-credentials').hidden = !ready;
+      const evidence = document.querySelector('#login-evidence');
+      evidence.hidden = ready || !currentLogin.evidence?.length;
+      evidence.textContent = currentLogin.evidence?.length ? `Motivo: ${currentLogin.evidence.join(' ')}` : '';
+      runButton.title = required && !ready ? 'Guarda un usuario y contraseña válidos para ejecutar.' : '';
+      if (loginDialog.open && ready) { closeLoginDialog(); show(`Usuario validado. Preparando los casos de US-${id}…`); form.requestSubmit(); }
+    }
+    async function postLogin(path, payload) {
+      try { const response = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await response.json(); return { ok: response.ok && data.ok !== false, data }; }
+      catch { return { ok: false, data: { message: 'No se pudo conectar con el QA Runner.' } }; }
+    }
+    document.querySelector('#credentials-form').addEventListener('submit', async event => {
+      event.preventDefault(); const id = loginPanel.dataset.id; const url = loginPanel.dataset.url;
+      const username = document.querySelector('#login-username').value.trim(); const passwordInput = document.querySelector('#login-password');
+      if (!username || !passwordInput.value) { show('Escribe el usuario y la contraseña de prueba.', true); return; }
+      const submit = event.submitter; submit.disabled = true; show('Validando credenciales: iniciando sesión en la aplicación…');
+      const { ok, data } = await postLogin('/api/credentials', { id, testUrl: url, username, password: passwordInput.value });
+      submit.disabled = false; passwordInput.value = ''; show(data.message || (ok ? 'Credenciales guardadas.' : 'No se pudo validar el login.'), !ok);
+      if (data.login) renderLogin(data.login, id, url);
+    });
+    let loginPolling = false;
+    // Espera el resultado del navegador de login; mientras tanto muestra "Ya inicié sesión".
+    function pollInteractiveLogin(id, url) {
+      if (loginPolling) return; loginPolling = true;
+      const interactiveButton = document.querySelector('#interactive-login'); const confirmButton = document.querySelector('#confirm-login');
+      interactiveButton.disabled = true; confirmButton.hidden = false; confirmButton.disabled = false;
+      const poll = async () => {
+        const response = await fetch(`/api/login-browser/${id}`).then(r => r.json()).catch(() => ({ status: 'failed', message: 'Se perdió la conexión con el QA Runner.' }));
+        if (response.status === 'waiting') { setTimeout(poll, 2000); return; }
+        loginPolling = false; interactiveButton.disabled = false; confirmButton.hidden = true;
+        if (response.status !== 'idle') show(response.message, response.status !== 'ok');
+        if (response.login) renderLogin(response.login, id, url);
+      };
+      setTimeout(poll, 1500);
+    }
+    document.querySelector('#interactive-login').addEventListener('click', async () => {
+      const id = loginPanel.dataset.id; const url = loginPanel.dataset.url;
+      const { ok, data } = await postLogin('/api/login-browser', { id, testUrl: url }); show(data.message, !ok);
+      if (ok || data.status === 'waiting') pollInteractiveLogin(id, url);
+    });
+    document.querySelector('#confirm-login').addEventListener('click', async event => {
+      const id = loginPanel.dataset.id; event.currentTarget.disabled = true;
+      const { ok, data } = await postLogin('/api/login-browser/done', { id, testUrl: loginPanel.dataset.url }); show(data.message, !ok);
+      if (!ok) event.currentTarget.disabled = false;
+    });
+    document.querySelector('#clear-credentials').addEventListener('click', async () => {
+      const id = loginPanel.dataset.id; const { ok, data } = await postLogin('/api/credentials/clear', { id }); show(data.message, !ok); if (data.login) renderLogin(data.login, id, loginPanel.dataset.url);
+    });
     function renderPlan(data, id) {
       currentPlan = data.plan; const scenarios = currentPlan.testScenarios || []; setup.hidden = true; review.hidden = false; footer.hidden = false; setStage(2);
       const selectedTestTypes = Array.isArray(currentPlan.selectedTestTypes) ? currentPlan.selectedTestTypes : ['functional']; document.querySelectorAll('input[name="test-type"]').forEach(input => { input.checked = selectedTestTypes.includes(input.value); });
       document.querySelector('#story-id').textContent = `▤ US-${id}`; document.querySelector('#project-name').textContent = currentPlan.projectName || currentPlan.storyTitle || `Historia US-${id}`; document.querySelector('#scenario-count').textContent = `${scenarios.length} casos`;
       const link = document.querySelector('#test-link'); link.href = data.access.url; link.textContent = data.access.url; updateHealth(data.access);
-      document.querySelector('#manual-login').href = data.access.url; document.querySelector('#manual-login').hidden = !(data.access.warning || data.access.protected); document.querySelector('#credential-note').hidden = !(data.access.warning || data.access.protected);
+      const manualLogin = document.querySelector('#manual-login');
+      const credNote = document.querySelector('#credential-note');
+      manualLogin.href = data.access.url;
+      // 1. Mostrar de forma visible la solicitud de login de acceso al validar el enlace
+      manualLogin.hidden = false;
+      manualLogin.textContent = '🔑 Abrir enlace de prueba para iniciar sesión / login ↗';
+      manualLogin.style.fontSize = '12px';
+      manualLogin.style.padding = '6px 12px';
+      manualLogin.style.background = '#eef6fb';
+      manualLogin.style.borderRadius = '6px';
+      manualLogin.style.border = '1px solid #c2def0';
+      credNote.hidden = true;
+      renderLogin(data.access.login, id, data.access.url);
       scenarioList.replaceChildren(); const severities = new Set(); const types = new Set();
       scenarios.forEach((scenario, index) => {
         const caseId = getCaseId(scenario, index); const polarity = getPolarity(scenario); const severity = scenario.severity || 'Sin clasificar'; const type = scenario.testType || 'Sin clasificar'; severities.add(severity); types.add(type);
@@ -254,6 +455,8 @@
       });
       populateFilter(severityFilter, severities, 'Todas'); populateFilter(typeFilter, types, 'Todos'); severityFilter.value = 'all'; typeFilter.value = 'all'; polarityFilter.value = 'all'; searchInput.value = ''; activeQuickFilter = 'all'; renderQuickFilters();
       if (scenarios.length) renderDetail(scenarios[0], 0); else renderDetail(null); scenarioList.querySelector('.scenario-row')?.classList.add('selected');
+      // Si la última ejecución dejó casos esperando datos del usuario, se piden ahora.
+      if (data.access?.login?.ready !== false || !data.access?.login?.requiresLogin) checkPendingInputs(id);
       const techniques = document.querySelector('#technique-list'); techniques.replaceChildren(); (currentPlan.testTechniques || []).forEach(technique => { const li = document.createElement('li'); li.textContent = typeof technique === 'string' ? technique : technique.name; if (typeof technique === 'object' && technique.justification) li.title = technique.justification; techniques.append(li); }); document.querySelector('.techniques').hidden = !(currentPlan.testTechniques || []).length;
       document.querySelectorAll('input[name="browser"]').forEach(browser => { browser.checked = (currentPlan.selectedBrowsers || ['chromium']).includes(browser.value); }); updateSelection(); status.hidden = true;
     }
@@ -261,13 +464,13 @@
     function updateHealth(access) { const pill = document.querySelector('#health-state'); pill.classList.toggle('warning', Boolean(access.warning || access.protected)); document.querySelector('#access-state').textContent = access.warning || (access.protected ? `Autenticación requerida · HTTP ${access.status}` : `HTTP ${access.status} OK${access.latencyMs ? ` (${access.latencyMs}ms)` : ''}`); }
     function populateFilter(select, values, label) { select.replaceChildren(new Option(label, 'all')); [...values].sort((a, b) => a.localeCompare(b, 'es')).forEach(value => select.add(new Option(value, value))); }
     function renderQuickFilters() {
-      const rows = [...scenarioList.querySelectorAll('.scenario-row')]; const defs = [['all', `Todos (${rows.length})`], ['Positivo', `Positivos (${rows.filter(row => row.dataset.polarity === 'Positivo').length})`], ['Negativo', `Negativos (${rows.filter(row => row.dataset.polarity === 'Negativo').length})`], ['high', `Severidad Alta (${rows.filter(row => /alta|crít|crit/i.test(row.dataset.severity)).length})`], ['integration', `Integración (${rows.filter(row => /integraci/i.test(row.dataset.testType)).length})`]]; quickFilters.replaceChildren();
+      const rows = [...scenarioList.querySelectorAll('.scenario-row')]; const defs = [['all', `Todos (${rows.length})`], ['Positivo', `Positivos (${rows.filter(row => row.dataset.polarity === 'Positivo').length})`], ['Negativo', `Negativos (${rows.filter(row => row.dataset.polarity === 'Negativo').length})`], ['high', `Severidad Alta (${rows.filter(row => /alta|crít|crit/i.test(row.dataset.severity)).length})`], ['integration', `Integración (${rows.filter(row => /integraci/i.test(row.dataset.testType)).length})`], ['error-guessing', `Adivinación de errores (${rows.filter(row => /adivinaci|error guess/i.test(row.dataset.technique)).length})`]]; quickFilters.replaceChildren();
       defs.forEach(([value, label]) => { const button = document.createElement('button'); button.type = 'button'; button.className = `filter-chip${value === 'Negativo' ? ' negative' : value === 'high' ? ' danger' : ''}${activeQuickFilter === value ? ' active' : ''}`; button.textContent = label; button.addEventListener('click', () => { activeQuickFilter = value; renderQuickFilters(); applyFilters(); }); quickFilters.append(button); });
       const clear = document.createElement('button'); clear.type = 'button'; clear.className = 'filter-chip'; clear.style.marginLeft = 'auto'; clear.textContent = 'Deseleccionar todos'; clear.addEventListener('click', () => { scenarioList.querySelectorAll('.scenario-select').forEach(check => { check.checked = false; }); updateSelection(); }); quickFilters.append(clear);
     }
     function applyFilters() {
       const query = searchInput.value.trim().toLocaleLowerCase('es');
-      scenarioList.querySelectorAll('.scenario-row').forEach(row => { const severity = severityFilter.value === 'all' || row.dataset.severity === severityFilter.value; const type = typeFilter.value === 'all' || row.dataset.testType === typeFilter.value; const polarity = polarityFilter.value === 'all' || row.dataset.polarity === polarityFilter.value; const quick = activeQuickFilter === 'all' || activeQuickFilter === 'high' && /alta|crít|crit/i.test(row.dataset.severity) || activeQuickFilter === 'integration' && /integraci/i.test(row.dataset.testType) || activeQuickFilter === row.dataset.polarity; const search = !query || `${row.dataset.caseId} ${row.dataset.title} ${row.dataset.testType} ${row.dataset.severity} ${row.dataset.technique}`.toLocaleLowerCase('es').includes(query); row.hidden = !(severity && type && polarity && quick && search); }); updateSelection();
+      scenarioList.querySelectorAll('.scenario-row').forEach(row => { const severity = severityFilter.value === 'all' || row.dataset.severity === severityFilter.value; const type = typeFilter.value === 'all' || row.dataset.testType === typeFilter.value; const polarity = polarityFilter.value === 'all' || row.dataset.polarity === polarityFilter.value; const quick = activeQuickFilter === 'all' || activeQuickFilter === 'high' && /alta|crít|crit/i.test(row.dataset.severity) || activeQuickFilter === 'integration' && /integraci/i.test(row.dataset.testType) || activeQuickFilter === 'error-guessing' && /adivinaci|error guess/i.test(row.dataset.technique) || activeQuickFilter === row.dataset.polarity; const search = !query || `${row.dataset.caseId} ${row.dataset.title} ${row.dataset.testType} ${row.dataset.severity} ${row.dataset.technique}`.toLocaleLowerCase('es').includes(query); row.hidden = !(severity && type && polarity && quick && search); }); updateSelection();
     }
     function getSelectedTestTypes() { return [...document.querySelectorAll('input[name="test-type"]:checked')].map(input => input.value); }
     function updateSelection() {
@@ -284,16 +487,36 @@
       selected.forEach(({ scenario, id }) => { lines.push(`  @${id} @${getPolarity(scenario).toLocaleLowerCase('es')}`, `  Escenario: ${scenario.title || id}`); const prereqs = scenario.prerequisites ? (Array.isArray(scenario.prerequisites) ? scenario.prerequisites : [scenario.prerequisites]) : []; prereqs.forEach(value => lines.push(`    Dado ${value}`)); buildSteps(scenario).forEach((step, index) => lines.push(`    ${index === 0 && !prereqs.length ? 'Dado ' : 'Cuando '}${step}`)); if (scenario.expectedResult) lines.push(`    Entonces ${scenario.expectedResult}`); lines.push(''); });
       const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })); link.download = `${currentPlan.storyId || 'qa'}-selected.feature`; link.click(); URL.revokeObjectURL(link.href);
     }
-    async function pollPreparation(id) { try { const response = await fetch(`/api/prepare/${id}`); const data = await response.json(); if (data.status === 'planning') { show('Generando plan de pruebas…'); timer = setTimeout(() => pollPreparation(id), 2000); return; } setBusy(false); if (data.status === 'prepared') { renderPlan(data, id); return; } show(data.message || 'No se pudo preparar el plan.', true); } catch { setBusy(false); show('No se pudo conectar con el QA Runner. Inicia node tools/qa-runner.mjs.', true); } }
-    async function pollRun(id) { try { const response = await fetch(`/api/status/${id}`); const data = await response.json(); if (data.status === 'running') { setStage(3); show(`Ejecutando QA para US-${id}…`); timer = setTimeout(() => pollRun(id), 2500); return; } setBusy(false); if (data.status === 'completed' && data.reportUrl) { show(`US-${id} terminó. `); const link = document.createElement('a'); link.href = data.reportUrl; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Abrir reporte HTML'; status.append(link); return; } show(data.message || 'La ejecución terminó sin reporte HTML.', true); } catch { setBusy(false); show('No se pudo conectar con el QA Runner.', true); } }
-    form.addEventListener('submit', async event => { event.preventDefault(); const id = taskInput.value.trim(); const testUrl = testUrlInput.value.trim(); if (!form.reportValidity() || !/^\d+$/.test(id)) { show('Introduce una tarea numérica y un host válido.', true); return; } setBusy(true); review.hidden = true; footer.hidden = true; show(`Validando el host y preparando US-${id}…`); try { const response = await fetch('/api/prepare', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, testUrl }) }); const data = await response.json(); if (!response.ok) { setBusy(false); show(data.message || 'No se pudo preparar la validación.', true); return; } if (data.status === 'prepared') { setBusy(false); renderPlan(data, id); return; } timer = setTimeout(() => pollPreparation(id), 1200); } catch { setBusy(false); show('No se pudo conectar con el QA Runner. Inicia node tools/qa-runner.mjs.', true); } });
+    async function pollPreparation(id) { try { const response = await fetch(`/api/prepare/${id}`); const data = await response.json(); if (data.status === 'planning') { show('Generando plan de pruebas…'); timer = setTimeout(() => pollPreparation(id), 2000); return; } setBusy(false); if (data.status === 'login_required') { openLoginDialog(data, id); return; } if (data.status === 'prepared') { renderPlan(data, id); return; } show(data.message || 'No se pudo preparar el plan.', true); } catch { setBusy(false); show('No se pudo conectar con el QA Runner. Inicia node tools/qa-runner.mjs.', true); } }
+    let runStartedAt = 0;
+    async function pollRun(id) { try { const response = await fetch(`/api/status/${id}?since=${runStartedAt}`); const data = await response.json(); if (data.status === 'running') { setStage(3); show(data.message || `Ejecutando QA para US-${id}…`); timer = setTimeout(() => pollRun(id), 2500); return; } setBusy(false); if (data.status === 'completed' && data.reportUrl) { show(`US-${id} terminó. `); const link = document.createElement('a'); link.href = data.reportUrl; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Abrir reporte HTML'; status.append(link); if (data.triageRunning) status.append(' · El agente sigue analizando los fallos en segundo plano; recarga el reporte en unos minutos.'); checkPendingInputs(id); return; } show(data.message || 'La ejecución terminó sin reporte HTML.', true); fetch(`/api/login-browser/${id}`).then(r => r.json()).then(state => { if (!state.login?.requiresLogin) return; if (!state.login.ready) openLoginDialog({ access: { url: testUrlInput.value.trim(), login: state.login } }, id); else renderLogin(state.login, id, testUrlInput.value.trim()); }).catch(() => {}); } catch { setBusy(false); show('No se pudo conectar con el QA Runner.', true); } }
+    form.addEventListener('submit', async event => { event.preventDefault(); const id = taskInput.value.trim(); const testUrl = testUrlInput.value.trim(); if (!form.reportValidity() || !/^\d+$/.test(id)) { show('Introduce una tarea numérica y un host válido.', true); return; } setBusy(true); review.hidden = true; footer.hidden = true; show(`Validando el host y preparando US-${id}…`); try { const response = await fetch('/api/prepare', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, testUrl }) }); const data = await response.json(); if (!response.ok) { setBusy(false); show(data.message || 'No se pudo preparar la validación.', true); return; } if (data.status === 'login_required') { setBusy(false); openLoginDialog(data, id); return; } if (data.status === 'prepared') { setBusy(false); renderPlan(data, id); return; } timer = setTimeout(() => pollPreparation(id), 1200); } catch { setBusy(false); show('No se pudo conectar con el QA Runner. Inicia node tools/qa-runner.mjs.', true); } });
     scenarioList.addEventListener('change', updateSelection); scenarioList.addEventListener('click', event => { if (event.target.closest('input')) return; const row = event.target.closest('.scenario-row'); if (row && currentPlan) selectScenario(row); });
     selectVisible.addEventListener('change', () => { scenarioList.querySelectorAll('.scenario-row:not([hidden]) .scenario-select').forEach(check => { check.checked = selectVisible.checked; }); updateSelection(); });
     [severityFilter, typeFilter, polarityFilter].forEach(filter => filter.addEventListener('change', applyFilters)); searchInput.addEventListener('input', applyFilters); document.querySelectorAll('input[name="browser"]').forEach(browser => browser.addEventListener('change', updateSelection));
     document.querySelectorAll('input[name="test-type"]').forEach(input => input.addEventListener('change', updateSelection));
     document.querySelector('#edit-variables').addEventListener('click', () => { review.hidden = true; footer.hidden = true; setup.hidden = false; setStage(1); taskInput.focus(); });
     [taskInput, testUrlInput].forEach(field => field.addEventListener('input', () => { if (!review.hidden) { review.hidden = true; footer.hidden = true; setup.hidden = false; setStage(1); show('Cambiaste los datos. Valídalos otra vez antes de ejecutar.'); } }));
-    runButton.addEventListener('click', async () => { const id = taskInput.value.trim(); const testUrl = testUrlInput.value.trim(); const selectedTestTypes = getSelectedTestTypes(); const functionalEnabled = selectedTestTypes.includes('functional'); const selectedChecks = functionalEnabled ? [...scenarioList.querySelectorAll('.scenario-select:checked')] : []; const selectedScenarioIds = selectedChecks.map(check => check.value); const polarities = new Set(selectedChecks.map(check => check.closest('.scenario-row').dataset.polarity)); const selectedBrowsers = functionalEnabled ? [...document.querySelectorAll('input[name="browser"]:checked')].map(browser => browser.value) : []; if (!selectedTestTypes.length) { show('Selecciona al menos una modalidad de prueba.', true); return; } if (functionalEnabled && (!selectedScenarioIds.length || !polarities.has('Positivo') || !polarities.has('Negativo') || polarities.has('Sin clasificar'))) { show('Para pruebas funcionales, selecciona al menos un caso positivo y uno negativo, y clasifica todos los casos elegidos.', true); return; } if (functionalEnabled && !selectedBrowsers.length) { show('Selecciona al menos un navegador para las pruebas funcionales.', true); return; } setBusy(true); setStage(3); show(`Iniciando ${selectedTestTypes.join(', ')}${functionalEnabled ? ` · ${selectedScenarioIds.length} casos en ${selectedBrowsers.join(', ')}` : ''}…`); try { const response = await fetch('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, testUrl, reviewed: true, selectedScenarioIds, selectedBrowsers, selectedTestTypes }) }); const data = await response.json(); if (!response.ok) { setBusy(false); setStage(2); show(data.message || 'No se pudo iniciar la ejecución.', true); return; } pollRun(id); } catch { setBusy(false); setStage(2); show('No se pudo conectar con el QA Runner.', true); } });
+    runButton.addEventListener('click', async () => { const id = taskInput.value.trim(); const testUrl = testUrlInput.value.trim(); const selectedTestTypes = getSelectedTestTypes(); const functionalEnabled = selectedTestTypes.includes('functional'); const selectedChecks = functionalEnabled ? [...scenarioList.querySelectorAll('.scenario-select:checked')] : []; const selectedScenarioIds = selectedChecks.map(check => check.value); const polarities = new Set(selectedChecks.map(check => check.closest('.scenario-row').dataset.polarity)); const selectedBrowsers = functionalEnabled ? [...document.querySelectorAll('input[name="browser"]:checked')].map(browser => browser.value) : []; if (!selectedTestTypes.length) { show('Selecciona al menos una modalidad de prueba.', true); return; } if (currentLogin?.requiresLogin && !currentLogin?.ready) { show('Esta aplicación requiere iniciar sesión: guarda un usuario y contraseña válidos (o inicia sesión en el navegador si usa SSO/MFA) antes de ejecutar.', true); loginPanel.scrollIntoView({ behavior: 'smooth', block: 'center' }); document.querySelector('#login-username')?.focus(); return; } if (functionalEnabled && (!selectedScenarioIds.length || !polarities.has('Positivo') || !polarities.has('Negativo') || polarities.has('Sin clasificar'))) { show('Para pruebas funcionales, selecciona al menos un caso positivo y uno negativo, y clasifica todos los casos elegidos.', true); return; } if (functionalEnabled && !selectedBrowsers.length) { show('Selecciona al menos un navegador para las pruebas funcionales.', true); return; } setBusy(true); setStage(3); show(`Iniciando ${selectedTestTypes.join(', ')}${functionalEnabled ? ` · ${selectedScenarioIds.length} casos en ${selectedBrowsers.join(', ')}` : ''}…`); try { runStartedAt = Date.now() - 2000; const response = await fetch('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, testUrl, reviewed: true, selectedScenarioIds, selectedBrowsers, selectedTestTypes, regenerateSpec: document.getElementById('regenerate-spec')?.checked === true }) }); const data = await response.json(); if (!response.ok) { setBusy(false); setStage(2); if (data.login) renderLogin(data.login, id, testUrl); show(data.message || 'No se pudo iniciar la ejecución.', true); return; } pollRun(id); } catch { setBusy(false); setStage(2); show('No se pudo conectar con el QA Runner.', true); } });
+  </script>
+  <script>
+    /* Guardar informe: captura el HTML actual y lo descarga */
+    document.getElementById('save-report')?.addEventListener('click', function () {
+      try {
+        var ts = new Date().toISOString().replace(/[:.]/g, '-');
+        var filename = 'qa-report-' + ts + '.html';
+        var blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      } catch (e) {
+        alert('No se pudo guardar el informe: ' + e.message);
+      }
+    });
   </script>
 </body>
 </html>

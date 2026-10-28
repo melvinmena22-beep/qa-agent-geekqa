@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "execution-report.json del agente QA",
+  "description": "Formato único de 3-outputs/run/US-{id}/execution/execution-report.json. Lo genera tools/hybrid-executor.mjs y lo actualiza el triage; cualquier agente que lo escriba debe respetarlo.",
+  "type": "object",
+  "required": [
+    "storyId",
+    "projectName",
+    "url",
+    "executedAt",
+    "executionMode",
+    "selectedTestTypes",
+    "selectedBrowsers",
+    "selectedScenarioIds",
+    "durationMs",
+    "summary",
+    "scenarios",
+    "findings",
+    "triage"
+  ],
+  "properties": {
+    "storyId": {
+      "type": "string",
+      "pattern": "^(US-\\d+|REPO-.+)$"
+    },
+    "projectName": {
+      "type": "string"
+    },
+    "url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "executedAt": {
+      "type": "string"
+    },
+    "skill": {
+      "type": "string"
+    },
+    "engine": {
+      "type": "string"
+    },
+    "executionMode": {
+      "type": "string",
+      "enum": [
+        "playwright",
+        "agent",
+        "legacy"
+      ]
+    },
+    "selectedTestTypes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "functional",
+          "accessibility",
+          "performance"
+        ]
+      }
+    },
+    "selectedBrowsers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "chromium",
+          "firefox",
+          "webkit"
+        ]
+      }
+    },
+    "selectedScenarioIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^SC_\\d{3}$"
+      }
+    },
+    "durationMs": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0
+    },
+    "playwrightExitCode": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "playwrightErrors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "specAudit": {
+      "type": "array",
+      "description": "Tests del spec rechazados por tools/qa-guards.mjs (sin aserciones, tautológicos, dominio ajeno o fuera del plan).",
+      "items": {
+        "type": "object",
+        "required": [
+          "title",
+          "issues"
+        ],
+        "properties": {
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "total",
+        "passed",
+        "failed",
+        "blocked",
+        "successRate"
+      ],
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "flaky": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "successRate": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "browser",
+          "status",
+          "reason",
+          "durationMs",
+          "error",
+          "screenshot"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^SC_\\d{3}$"
+          },
+          "title": {
+            "type": "string"
+          },
+          "browser": {
+            "type": "string",
+            "enum": [
+              "chromium",
+              "firefox",
+              "webkit"
+            ]
+          },
+          "testPolarity": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requirementRefs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "technique": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PASS",
+              "FAIL",
+              "BLOCKED"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^(BLOCKED/[A-Z_]+|FLAKY)$"
+          },
+          "failureType": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "ASSERTION",
+              "TIMEOUT",
+              null
+            ]
+          },
+          "flaky": {
+            "type": "boolean"
+          },
+          "durationMs": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "screenshot": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "bugId": {
+            "type": [
+              "string",
+              "integer",
+              "null"
+            ]
+          },
+          "triage": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "PRODUCT_DEFECT",
+              "SCRIPT_DEFECT",
+              "ENVIRONMENT",
+              "FLAKY",
+              null
+            ]
+          },
+          "triageNote": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Explicación del triage (clasificación, causa y reproducción)."
+          },
+          "azureDevOpsId": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "evidence": {
+            "type": "array",
+            "description": "Evidencias del fallo copiadas desde Playwright (rutas relativas a la carpeta de la historia).",
+            "items": {
+              "type": "object",
+              "required": [
+                "type",
+                "path"
+              ],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "screenshot",
+                    "video",
+                    "trace",
+                    "page-snapshot"
+                  ]
+                },
+                "path": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "steps": {
+            "type": "array",
+            "description": "Resultado de cada test.step del escenario.",
+            "items": {
+              "type": "object",
+              "required": [
+                "title",
+                "status"
+              ],
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "PASS",
+                    "FAIL"
+                  ]
+                },
+                "durationMs": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array"
+    },
+    "triage": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "done",
+        "not_required"
+      ]
+    }
+  }
+}

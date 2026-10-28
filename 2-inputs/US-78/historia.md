@@ -31,4 +31,4 @@ El sistema debe permtir que haya un valor de diferencia positivo o negativo
 - URL: https://dev.azure.com/GSID-Autogestion/9a29ac17-af10-48ab-88cd-1a7193a3900a/_workitems/edit/78
 - Última modificación: 2026-09-21T17:06:16.537Z
 
-- URL de pruebas: https://uniwebpro.geekqa.net/
+- URL de pruebas: https://portalcomercialqa.gruposid.com.do/auth/login

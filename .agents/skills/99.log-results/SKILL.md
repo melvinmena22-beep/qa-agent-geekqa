@@ -22,7 +22,7 @@ Esta habilidad consolida **TODOS** los outputs de las habilidades ejecutadas:
 
 - **Ejecución / Funcional**: `3-outputs/run/{story-id}/execution/execution-report.json` (casos de prueba, pasos, resultados)
 - **Accesibilidad**: `3-outputs/run/{story-id}/accessibility/` (archivos JSON de axe-core, reportes por breakpoint)
-- **Lighthouse**: `3-outputs/run/{story-id}/lighthouse/{story-id}-lighthouse.json` y `.html`
+- **Lighthouse**: `3-outputs/run/{story-id}/lighthouse/{story-id}-lighthouse.json` (medianas de 3 corridas, umbrales y estado) y el HTML de su `representativeRun` en `lighthouse/raw/`
 - **Bugs/Errores**: `3-outputs/run/{story-id}/bugs/{story-id}-bugs.json` y `{story-id}-bugs.md` (con evidencia en `bugs/evidence/`)
 - **Planificación**: `3-outputs/run/{story-id}/planning/{story-id}-plan.json` y `{story-id}-plan.html`
 - **Plantilla HTML**: `templates/test-report-template.html`
@@ -33,9 +33,9 @@ Esta habilidad consolida **TODOS** los outputs de las habilidades ejecutadas:
 
 2.  **Consolidar Datos de TODOS los Skills**:
     -   **Ejecución Funcional**: Lee `execution-report.json`, extrae: casos ejecutados, pasados/fallidos, pasos, evidencia.
-      -   Conserva el arreglo `screenshots` de cada resultado y asocia cada imagen con el ID y nombre del caso correcto. No reutilices una misma captura para casos distintos.
+      -   Conserva el campo `screenshot` de cada resultado y asocia cada imagen con el ID y nombre del caso correcto. No reutilices una misma captura para casos distintos.
     -   **Accesibilidad**: Lee archivos JSON de axe-core de cada breakpoint (mobile 375px, tablet 768px, desktop 1440px), consolida todas las violaciones y pasus.
-    -   **Lighthouse**: Lee `{story-id}-lighthouse.json`, extrae puntajes, oportunidades, diagnósticos.
+    -   **Lighthouse**: Lee `{story-id}-lighthouse.json`, usa las medianas por dispositivo (nunca una corrida aislada), los umbrales `budgets` y el `status`.
 
     -   **Bugs/Report-Bugs**: Lee `{story-id}-bugs.json` y `{story-id}-bugs.md`, extrae:
         - IDs de bugs (ej. BUG-US_001-01)
@@ -52,16 +52,17 @@ Esta habilidad consolida **TODOS** los outputs de las habilidades ejecutadas:
     -   Para cada escenario ejecutado, agrega en su fila un enlace visible a su screenshot y una miniatura o acceso ampliable. Incluye además todas las capturas por caso en la galería con leyenda y texto alternativo que identifiquen el escenario, resultado, navegador e intento. Para un fallo, prioriza la captura tomada al ocurrir el error y enlázala también desde el bug correspondiente cuando exista.
 
 5.  **Aplicar Reglas de Fallos Automáticos**:
-    -   ❌ Si **algún Lighthouse < 80** (cualquier categoría): marcar como FAIL
+    -   ❌ Si el `status` de `{story-id}-lighthouse.json` es FAIL (alguna mediana por debajo de su umbral): marcar como FAIL
     -   ❌ Si **existel bugs.json con items**: marcar todos esos bugs como FAIL
-    -   ❌ Si **cualquier prueba funcional estado = FAILED**: contar como fallo
+    -   ❌ Si **cualquier prueba funcional tiene status = FAIL**: contar como fallo (los casos con `flaky: true` cuentan como aprobados, pero se listan como intermitentes)
     -   ❌ Si **violaciones críticas A11y**: marcar como FAIL
     -   **Veredicto General**: PASS solo si todos los checks pasan sin Bugs críticos
 
 6.  **Cargar y Poblar Plantilla HTML**:
     -   Lee `templates/test-report-template.html`.
     -   Reemplaza placeholders con:
-        - Información de historia (URL, Title, Story ID)
+        - Información de historia (URL probada destacada y **centralizada en el informe**, Title, Story ID).
+        - El enlace de la URL de pruebas debe mostrarse centrado horizontalmente dentro de los detalles del reporte o encabezado para facilitar el acceso rápido del equipo.
         - Tabla `detailedResults` con todas las filas consolidadas; rellena `{{screenshotLink}}` con un enlace y miniatura a la captura del caso, o con una advertencia breve si no existe.
         - Sección de Bugs con enlace a cada evidencia
         - Sección de Accesibilidad con resumen por breakpoint
@@ -74,13 +75,13 @@ Esta habilidad consolida **TODOS** los outputs de las habilidades ejecutadas:
         |------|-----------|---------|----------|
         | Funcional | 12 | 11 | 1 | ← datos de execution-report
         | Accesibilidad (3 breakpoints) | 3 auditorías | Todas limpias o # violaciones | # críticas |
-        | Lighthouse | 6 categorías | # >= 80 | # < 80 |
+        | Lighthouse | 4 categorías × 2 dispositivos | # que cumplen umbral | # bajo umbral |
         | Bugs Encontrados | - | - | 5 |
         | **TOTAL** | todos los anteriores | X% éxito | X% fallo |
 
 9.  **Incluir Enlaces a Reportes Originales**:
     -   En cada sección, incluir enlaces a los reportes HTML originales:
-        - "Ver Reporte Lighthouse completo" → `lighthouse/{story-id}-lighthouse.html`
+        - "Ver Reporte Lighthouse completo" → el HTML de `representativeRun` (`lighthouse/raw/{story-id}-mobile-run{n}.report.html`)
         - "Ver Reporte Bugs en detalle" → `bugs/{story-id}-bugs.md`
         - "Ver Plan de Pruebas" → `planning/{story-id}-plan.html`
 

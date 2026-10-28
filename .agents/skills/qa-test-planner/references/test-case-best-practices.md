@@ -44,6 +44,26 @@ Selecciona las técnicas que aporten cobertura al requisito y registra su justif
 - **Tablas de decisión:** reglas cuyo resultado depende de varias condiciones combinadas.
 - **Adivinación de errores:** riesgos basados en defectos conocidos, criterios ambiguos, datos vacíos/duplicados o fallos de integración; indicar el riesgo que motiva el caso.
 
+### Adivinación de errores (obligatoria)
+
+La adivinación de errores (Error Guessing, ISTQB CTFL v4.0 §4.4.1) usa la experiencia del tester para anticipar defectos probables que las técnicas formales no cubren. Todo plan debe aplicarla:
+
+- Incluye **al menos 2 escenarios** con `technique: "Adivinación de errores"` dentro de los escenarios del plan, y registra la técnica en `testTechniques` con su justificación.
+- Cada uno de esos escenarios debe incluir `errorGuessingRisk`: el defecto que se anticipa y por qué es probable en esta funcionalidad (p. ej. "doble clic en Guardar puede crear registros duplicados porque el botón no se deshabilita").
+- Elige los riesgos del catálogo según lo que la historia realmente expone (formularios, búsquedas, flujos, integraciones). No los apliques a ciegas:
+
+| Categoría | Errores a anticipar |
+|---|---|
+| Entradas | Campos vacíos o solo con espacios; espacios al inicio/fin; caracteres especiales, acentos, ñ y emojis; textos muy largos; valores negativos, cero y decimales; formatos inválidos (email, teléfono, fecha) |
+| Datos | Registros duplicados (documento, email, código); mayúsculas/minúsculas en búsquedas; búsqueda parcial vs. exacta; listas vacías y paginación con 0, 1 o muchos resultados |
+| Interacción | Doble clic o envío repetido; recargar o volver atrás a mitad de un flujo; cerrar un modal con cambios sin guardar; abrir el mismo registro en dos pestañas |
+| Sesión y permisos | Sesión expirada durante la acción; acceso directo por URL a pantallas o registros sin permiso |
+| Integración | Respuestas de error del backend (500, timeout) sin mensaje para el usuario; datos que no se refrescan tras guardar; fechas y zonas horarias |
+| Seguridad básica | Entradas con aspecto de script o SQL (`<script>`, `' OR 1=1`) que deben mostrarse como texto, sin ejecutarse ni romper la pantalla |
+
+- El resultado esperado debe salir de los requisitos o de un comportamiento estándar verificable (rechazo con mensaje, sin duplicados, sin error 500, dato mostrado como texto). Si la historia no define el comportamiento, marca `clarificationRequired: true` y registra la pregunta: no inventes la regla.
+- Prioriza los riesgos con mayor impacto y probabilidad. Los defectos ya reportados en la misma funcionalidad (por ejemplo, en `bugs/` de historias anteriores o en la memoria del producto) son candidatos prioritarios.
+
 ## 4. Incluir un Grupo de Pruebas
 
 Incluir un Grupo de Pruebas según la complejidad y alcance de la historia de usuario:
