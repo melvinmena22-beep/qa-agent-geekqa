@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Ejecución de Pruebas QA</title>
+    <title>Reporte de Pruebas E2E — {{project_name}}</title>
+    <link rel="icon" href="/grupo-sid-logo.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -139,6 +140,14 @@
             border: 1px solid #ddd;
             margin-top: 10px;
         }
+        .evidence-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+        .evidence-item { margin: 0; padding: 16px; border: 1px solid #dee2e6; border-radius: 8px; background: #fff; }
+        .evidence-item img { display: block; width: 100%; height: auto; border: 1px solid #d9e0e2; border-radius: 6px; }
+        .evidence-item figcaption { margin-top: 10px; color: #52636a; font-size: 14px; line-height: 1.5; }
+        .evidence-gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; }
+        .evidence-item { margin: 0; padding: 16px; border: 1px solid #dee2e6; border-radius: 8px; background: #fff; }
+        .evidence-item img { display: block; width: 100%; height: auto; border: 1px solid #d9e0e2; border-radius: 6px; }
+        .evidence-item figcaption { margin-top: 10px; color: #52636a; font-size: 14px; line-height: 1.5; }
         /* Metric Cards for Summary */
         .metric-cards {
             display: flex;
@@ -163,12 +172,17 @@
         .metric-card.skipped { border-top-color: #6c757d; }
         .metric-value { font-size: 3em; font-weight: bold; color: #0d47a1; margin-bottom: 5px; }
         .metric-label { font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+        .progress-wrap { margin: 25px 0; }
+        .progress-track { height: 18px; background: #d9e0e2; border-radius: 999px; overflow: hidden; }
+        .progress-value { width: {{summary.successRate}}%; height: 100%; background: #16877c; }
+        .brand-logo { width: 176px; margin-bottom: 16px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Reporte de Ejecución de Pruebas QA</h1>
+            <img class="brand-logo" src="/grupo-sid-logo.svg" alt="GRUPO SID">
+            <h1>Reporte de Pruebas E2E — {{project_name}}</h1>
         </div>
         
         <div class="info-card">
@@ -203,6 +217,10 @@
                 <div class="metric-label">Tasa de Éxito</div>
             </div>
         </div>
+        <div class="progress-wrap">
+            <strong>Porcentaje de pruebas aprobadas: {{summary.successRate}}%</strong>
+            <div class="progress-track" role="progressbar" aria-valuenow="{{summary.successRate}}" aria-valuemin="0" aria-valuemax="100"><div class="progress-value"></div></div>
+        </div>
 
         <h2>Resultados Detallados de Pruebas</h2>
         <table>
@@ -217,6 +235,7 @@
                     <th>Estado</th>
                     <th>Detalles</th>
                     <th>ID de Bug</th>
+                    <th>Evidencia</th>
                 </tr>
             </thead>
             <tbody>
@@ -231,10 +250,16 @@
                     <td class="status-{{status}}">{{status}}</td>
                     <td>{{errorDetails}}</td>
                     <td><a href="#{{bugId}}">{{bugId}}</a></td>
+                    <td>{{screenshotLink}}</td>
                 </tr>
                 {{/each}}
             </tbody>
         </table>
+
+        <h2>Evidencias de las Pruebas</h2>
+        <div class="evidence-gallery">
+            {{evidence_gallery}}
+        </div>
 
         <h2>Bugs y Defectos Identificados</h2>
         {{#each bugs}}

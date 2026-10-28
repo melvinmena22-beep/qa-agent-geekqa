@@ -1,39 +1,35 @@
-# Bug Report
+# Bug Azure DevOps
 
-**Title:** [concise and descriptive title]
+**Título:** [descripción breve y observable del fallo]
+**Historia relacionada:** [ID y título]
+**Impacto:** [usuarios, proceso o datos afectados; no inferir sin evidencia]
+**Severidad:** [1 - Critical | 2 - High | 3 - Medium | 4 - Low]
+**Prioridad:** [definida por el equipo o pendiente]
+**Estado inicial:** New
 
-**Bug ID:** [unique identifier]
+## Repro Steps
+1. [Precondición y primer paso]
+2. [Siguiente acción]
+3. [Acción que reproduce el fallo]
 
-**Severity:** [Critical | High | Medium | Low]
-**Priority:** [High | Medium | Low]
+## System Info
+- **Ambiente/URL:** [URL]
+- **Navegador y versión:** [dato observado]
+- **Sistema operativo/dispositivo:** [dato observado]
+- **Resolución:** [dato observado o N/A]
+- **Usuario tester:** [dato disponible o N/A]
 
-**Environment:**
-- **URL:** [URL where the bug was found]
-- **Browser:** [Browser name and version]
-- **Operating System:** [OS name and version]
-- **Device:** [Desktop, Tablet, Mobile]
-- **Screen Resolution:** [e.g., 1920x1080]
+## Acceptance Criteria
+[Criterio de aceptación incumplido, citado o resumido fielmente desde la historia]
 
----
+## Expected Result
+[Resultado esperado según los criterios]
 
-### Steps to Reproduce:
-1. [First step]
-2. [Second step]
-3. [Third step]
-...
+## Actual Result
+[Resultado observado, mensaje de error y frecuencia]
 
-### Expected Result:
-[What was supposed to happen.]
+## Evidence
+- **Capturas/videos/logs:** [rutas relativas bajo 3-outputs/run/{story-id}/bugs/evidence/; confirmar que la captura también quedó adjunta al work item de Azure DevOps]
+- **Build/actividad/fechas de compromiso:** [valores disponibles o N/A; no inventar]
 
-### Actual Result:
-[What actually happened. Include error messages if any.]
-
----
-
-### Evidence:
-- **Screenshots:** [Link to screenshots]
-- **Videos:** [Link to videos]
-- **Console Logs:** [Link to or pasted console logs]
-
-### Additional Notes:
-[Any other relevant information.]
+**Azure DevOps Bug ID/URL:** [se completa después de crear el work item]

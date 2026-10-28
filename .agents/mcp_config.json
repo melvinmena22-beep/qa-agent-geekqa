@@ -46,6 +46,16 @@
         "--browser",
         "webkit"
       ]
+    },
+    "azure-devops": {
+      "command": "node",
+      "args": [
+        "tools/azure-devops-importer.mjs"
+      ],
+      "env": {
+        "AZDO_ORG_URL": "https://dev.azure.com/GSID-Autogestion",
+        "AZDO_PROJECT": "Pruebas-TI IA"
+      }
     }
   }
 }

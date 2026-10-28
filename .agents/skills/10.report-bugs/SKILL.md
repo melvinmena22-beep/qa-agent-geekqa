@@ -1,12 +1,12 @@
 ---
 name: report-bugs
-description: Analiza fallos de pruebas, genera reportes de errores y crea issues en Jira.
+description: Analiza fallos de pruebas, genera reportes de errores y crea Bugs en Azure DevOps.
 compatibility:
   gemini: ">=2.5.0"
 metadata:
   version: 1.1.0
   author: Gemini
-allowed-tools: "MCP Playwright"
+allowed-tools: "MCP Playwright, azure-devops.create_azure_bug, azure-devops.search_work_items"
 ---
 # Habilidad: Reportar Errores
 
@@ -26,14 +26,19 @@ Usa esta habilidad después de la ejecución de pruebas para analizar fallos y g
     -   Lee el archivo `execution-report.json` y filtra todas las pruebas con estado "FAILED".
     -   Si no se encuentran fallos, sale de la habilidad.
 2.  **Generar Reportes de Errores**:
-    -   Para cada prueba fallida, crea un reporte de error detallado usando la plantilla ubicada en `1-agent/.gemini/skills/10.report-bugs/templates/bug_template.md`.
+    -   Para cada prueba fallida reproducible, crea un reporte usando `templates/bug_template.md` con título, pasos de reproducción, resultado esperado y actual, ambiente, severidad, impacto y evidencia.
     -   Asigna una severidad (Crítica, Alta, Media, Baja) basada en un análisis del fallo.
     -   Genera un ID de error único (ej. `BUG-{story-id}-{nn}`).
     -   Copia toda la evidencia asociada (capturas de pantalla, logs) en el directorio `bugs/evidence/`, renombrando los archivos para que coincidan con el ID del error.
-3.  **Crear Issues en Jira (Opcional)**:
-    -   Si un MCP de Jira está configurado, crea un nuevo issue en Jira para cada error.
-    -   Pobla el issue con los detalles del error (título, severidad, pasos de reproducción, etc.) y adjunta la evidencia.
-    -   Registra el `jiraKey` en el reporte de error local.
+    -   Selecciona la captura que muestra el estado fallido y conserva su ruta relativa al workspace, por ejemplo `3-outputs/run/US-78/bugs/evidence/BUG-US-78-01.png`.
+3.  **Crear Bugs en Azure DevOps**:
+  -   Usa el MCP `azure-devops.create_azure_bug` para cada fallo reproducible y confirmado.
+  -   Pasa `evidenceFilePath` con la ruta de la captura guardada en `bugs/evidence/`, además del texto `evidence`. La herramienta sube la imagen y la agrega al work item como archivo adjunto; no basta con escribir el nombre o la ruta en la descripción.
+  -   Mapea el título a `System.Title`, los pasos a `Microsoft.VSTS.TCM.ReproSteps`, el ambiente/navegador a `Microsoft.VSTS.TCM.SystemInfo`, y la severidad a `Microsoft.VSTS.Common.Severity`.
+  -   Incluye resultado esperado, actual, impacto y evidencia en la descripción. La herramienta hereda Area e Iteration de la historia y vincula el bug con ella.
+  -   No crees bugs por pruebas omitidas, bloqueadas por ambiente o errores no reproducibles. No dupliques un bug existente; registra su ID si se identifica.
+  -   Registra el `azureDevOpsId`, URL, nombre de la evidencia y `evidenceAttached` devuelto por la herramienta en el reporte local.
+  -   Confirma `evidenceAttached: true` en la respuesta de la herramienta antes de afirmar que la imagen quedó adjunta. Si no hay captura disponible o falla la carga, conserva el bug/reporte local y registra claramente la advertencia; nunca declares que se adjuntó.
 4.  **Guardar Reportes**:
     -   Guarda los reportes de errores consolidados como un archivo JSON único (`{story-id}-bugs.json`) y un archivo Markdown (`{story-id}-bugs.md`) en el directorio de salida `bugs`.
 
@@ -46,7 +51,8 @@ Usa esta habilidad después de la ejecución de pruebas para analizar fallos y g
 
 - ✅ Un reporte `bugs.json` y `bugs.md` es creado si alguna prueba falló.
 - ✅ Toda la evidencia para pruebas fallidas es copiada y renombrada en el directorio `bugs/evidence/`.
-- ✅ Issues en Jira son creados para cada error (si está configurado).
+- ✅ La captura asociada al bug se adjunta en Azure DevOps como archivo, y el reporte local indica si la carga quedó confirmada.
+- ✅ Bugs reproducibles se crean en Azure DevOps cuando el MCP está configurado.
 
 ## Si Falla
 
@@ -54,4 +60,4 @@ Usa esta habilidad después de la ejecución de pruebas para analizar fallos y g
 |----------|--------|
 | Reporte de ejecución no encontrado | Registra un error y detiene. Esta habilidad no puede ejecutarse sin un reporte de ejecución de pruebas. |
 | Archivos de evidencia faltantes | Registra una advertencia y crea el reporte de error con una nota de que la evidencia no fue encontrada. |
-| MCP de Jira no disponible | Registra una advertencia, omite la creación en Jira, y completa la generación del reporte de error local. |
+| MCP de Azure DevOps no disponible | Registra una advertencia, conserva el reporte local y no afirmes que el bug fue creado en Azure. |

@@ -1,0 +1,107 @@
+{
+  "lastUpdated": "2026-10-12T21:39:00-04:00",
+  "application": "UniWebPro",
+  "pages": [
+    {
+      "url": "https://uniwebpro.geekqa.net/estudiantes",
+      "title": "Módulo Estudiantes — Registro",
+      "storyRef": "US-79",
+      "components": [
+        {
+          "name": "Botón Registrar Estudiante",
+          "role": "button",
+          "locator": "getByRole('button', { name: 'Registrar Estudiante' })",
+          "status": "confirmed-working",
+          "notes": "Abre el modal/dialog de registro. SC_002 PASS."
+        },
+        {
+          "name": "Modal de Registro",
+          "role": "dialog",
+          "locator": "div[role='dialog']",
+          "status": "confirmed-working",
+          "notes": "Contiene el formulario de registro de estudiantes."
+        },
+        {
+          "name": "Campo Nombre del Estudiante",
+          "role": "textbox",
+          "locator": "getByRole('textbox', { name: 'Nombre' }) | input dentro de dialog nth(0)",
+          "type": "input text",
+          "status": "presumed-working",
+          "notes": "Campo de texto estándar. No probado de forma aislada."
+        },
+        {
+          "name": "Campo Documento",
+          "role": "textbox",
+          "locator": "getByRole('textbox', { name: 'Documento' }) | input dentro de dialog nth(1)",
+          "type": "input text",
+          "status": "presumed-working",
+          "notes": "Campo de texto estándar."
+        },
+        {
+          "name": "Campo Carrera",
+          "role": "combobox|select",
+          "locator": "DESCONOCIDO — NO es input[type=text]",
+          "type": "dropdown/select/combobox",
+          "status": "PROBLEMA-SELECTOR",
+          "notes": "IMPORTANTE: No es un <input type='text'>. El spec .nth(2) falla con timeout. Inspeccionar manualmente para determinar el selector correcto. Posibles: getByRole('combobox'), select[name='carrera'], o componente UI customizado."
+        },
+        {
+          "name": "Campo Contacto",
+          "role": "textbox",
+          "locator": "getByRole('textbox', { name: 'Contacto' })",
+          "type": "input text",
+          "status": "presumed-working"
+        },
+        {
+          "name": "Campo Email",
+          "role": "textbox",
+          "locator": "getByRole('textbox', { name: 'Email' })",
+          "type": "input text|email",
+          "status": "presumed-working"
+        },
+        {
+          "name": "Botón Guardar/Registrar",
+          "role": "button",
+          "locator": "getByRole('button', { name: /guardar|registrar/i }) dentro de dialog",
+          "status": "confirmed-bug",
+          "notes": "BUG #84: Acepta envío con todos los campos vacíos sin validación."
+        },
+        {
+          "name": "Buscador del módulo Estudiantes",
+          "role": "textbox",
+          "locator": "getByRole('textbox', { name: 'Buscar por nombre o documento' }) | input[placeholder='Buscar por nombre o documento...']",
+          "status": "PROBLEMA-SELECTOR",
+          "notes": "USAR ESTE SELECTOR ESPECÍFICO. No usar input[placeholder*='Buscar'] porque hay 2 inputs que coinciden (buscador global + buscador del módulo)."
+        },
+        {
+          "name": "Buscador Global del Sistema (Navbar)",
+          "role": "textbox",
+          "locator": "getByRole('textbox', { name: 'Buscar en el sistema...' })",
+          "status": "confirmed-exists",
+          "notes": "EVITAR en tests del módulo Estudiantes. Causa strict mode violation."
+        },
+        {
+          "name": "Tabla de Resultados de Estudiantes",
+          "role": "table",
+          "locator": "table | getByRole('table')",
+          "status": "confirmed-working",
+          "notes": "Muestra los estudiantes registrados. Tiene botones por fila sin aria-label (bug de accesibilidad)."
+        },
+        {
+          "name": "Botones de acción por fila (Editar, Eliminar)",
+          "role": "button",
+          "locator": "button.hover:text-blue-600 (editar) | button.hover:text-red-500 (eliminar)",
+          "status": "a11y-defect",
+          "notes": "Sin texto discernible ni aria-label. Violación WCAG 4.1.2 (button-name, critical). 86 instancias en los 3 breakpoints."
+        }
+      ],
+      "knownIssues": [
+        "Selector ambiguo de búsqueda — 2 inputs con placeholder similar",
+        "Campo Carrera no es input de texto — tipo desconocido (dropdown/combobox)",
+        "Formulario sin validación de campos vacíos — Bug #84",
+        "Botones de tabla sin aria-label — 86 violaciones WCAG 4.1.2",
+        "Color contrast insuficiente en etiqueta 'Administrador' sidebar"
+      ]
+    }
+  ]
+}

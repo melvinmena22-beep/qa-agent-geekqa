@@ -13,11 +13,17 @@ Este proyecto es un agente de QA prototipo para validar aplicaciones web con Pla
 
 ## Reglas obligatorias
 - Usa la carpeta [2-inputs](2-inputs) como fuente principal de entrada.
+- Las historias pueden importarse desde Azure DevOps con la herramienta MCP `import_work_item`; después de importarlas, usa la carpeta creada en [2-inputs](2-inputs) como fuente trazable.
 - Usa la carpeta [3-outputs/memory](3-outputs/memory) como memoria del producto.
 - Guarda todos los resultados en la ruta [3-outputs/run](3-outputs/run)/{story-id}/.
 - No generes reportes, capturas ni archivos temporales fuera de esa estructura.
 - Si aparecen fallos, registra bugs en la carpeta bugs/ del story correspondiente.
-- Si una tarea requiere pruebas, ejecuta el flujo completo: contexto → plan → ejecución → evidencia → reporte final.
+- Ejecuta las pruebas dentro del agente activo mediante MCP Playwright. No delegues la ejecución a otro agente, proceso, CLI, shell ni spec Playwright separado.
+- Ejecuta solo `selectedScenarioIds`, `selectedBrowsers` y `selectedTestTypes` del plan/solicitud. Si `selectedBrowsers` falta o está vacío, usa Chromium. Si se seleccionó `functional` y `selectedScenarioIds` falta o está vacío, registra `BLOCKED/NO_SCENARIOS`; las auditorías sin modalidad funcional no requieren casos. No infieras casos ni modalidades faltantes.
+- Usa solo la habilidad de ejecución incluida en `selectedSkills`; `report-bugs` solo corre tras un fallo funcional confirmado.
+- Si `clarificationRequired` es `true`, registra `BLOCKED/CLARIFICATION_REQUIRED`; no conviertas supuestos en fallos ni bugs.
+- Si una tarea requiere pruebas, sigue este orden: leer historia y plan → ejecutar selección → guardar evidencia → generar reporte.
+- Aplica los límites y reglas de localizadores definidos en `.agents/skills/4.run-tests-browser/SKILL.md`; ese skill es la fuente única para la ejecución funcional.
 
 ## Flujo por defecto
 1. Identifica el story-id o la carpeta de entrada.
@@ -49,7 +55,7 @@ La estructura base debe ser:
 - tests/{story-id}.spec.ts
 
 ## Skills recomendadas
-- qa-test-planner para planificar la estrategia de QA.
+- qa-test-planner para analizar requisitos y planificar la estrategia de QA.
 - run-tests-browser para pruebas funcionales.
 - run-accessibility-tests para auditoría de accesibilidad.
 - run-lighthouse-tests para performance y calidad.

@@ -99,9 +99,58 @@
         <a href="{{url_or_endpoints}}" target="_blank">{{url_or_endpoints}}</a>
         
         <p><strong>Fecha y Hora:</strong> {{date_time}}</p>
+
+        <h2>Análisis Estático de Requisitos</h2>
+        <p><strong>Evaluación:</strong> {{static_analysis_assessment}}</p>
+        <p>{{static_analysis_summary}}</p>
+
+        <h3>Evaluación INVEST</h3>
+        <p>{{static_analysis_invest}}</p>
+
+        <h3>Hallazgos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID / Severidad</th>
+                    <th>Categoría y fuente</th>
+                    <th>Evidencia</th>
+                    <th>Impacto</th>
+                    <th>Recomendación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{static_analysis_findings}}
+            </tbody>
+        </table>
+
+        <h3>Preguntas Abiertas</h3>
+        <div>{{static_analysis_questions}}</div>
+
+        <h3>Ambigüedades y Puntos Ciegos — 5 preguntas</h3>
+        <div>{{static_analysis_ambiguity_questions}}</div>
+
+        <h3>Criterios de Aceptación Propuestos — Pendientes de aprobación</h3>
+        <p>Estas propuestas no son requisitos vigentes ni resultados esperados confirmados hasta que negocio las apruebe.</p>
+        <div>{{static_analysis_proposed_acceptance_criteria}}</div>
+
+        <h3>Limitaciones del Análisis</h3>
+        <div>{{static_analysis_limitations}}</div>
         
         <h2>Análisis de Riesgos de Prueba</h2>
         <p>{{test_risk_analysis}}</p>
+
+        <h2>Técnicas de Prueba ISTQB Aplicables</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Técnica</th>
+                    <th>Justificación y cobertura</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{test_techniques}}
+            </tbody>
+        </table>
 
         <h2>Activos Analizados</h2>
         <table>
@@ -127,6 +176,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Descripción</th>
+                    <th>Polaridad</th>
                     <th>Tipo de Prueba</th>
                     <th>Criterios de Aceptación Cubiertos</th>
                 </tr>

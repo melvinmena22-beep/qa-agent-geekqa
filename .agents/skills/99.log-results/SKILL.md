@@ -33,6 +33,7 @@ Esta habilidad consolida **TODOS** los outputs de las habilidades ejecutadas:
 
 2.  **Consolidar Datos de TODOS los Skills**:
     -   **Ejecución Funcional**: Lee `execution-report.json`, extrae: casos ejecutados, pasados/fallidos, pasos, evidencia.
+      -   Conserva el arreglo `screenshots` de cada resultado y asocia cada imagen con el ID y nombre del caso correcto. No reutilices una misma captura para casos distintos.
     -   **Accesibilidad**: Lee archivos JSON de axe-core de cada breakpoint (mobile 375px, tablet 768px, desktop 1440px), consolida todas las violaciones y pasus.
     -   **Lighthouse**: Lee `{story-id}-lighthouse.json`, extrae puntajes, oportunidades, diagnósticos.
 
@@ -41,12 +42,14 @@ Esta habilidad consolida **TODOS** los outputs de las habilidades ejecutadas:
         - Severidad (Crítica, Alta, Media, Baja)
         - Descripción y pasos de reproducción
         - Rutas a evidencia en `bugs/evidence/`
-        - JIRA keys (si existe)
+        - IDs y URLs de Azure DevOps (si existen)
 
 
 4.  **Analizar Escenarios de Prueba**: 
     -   Lee `planning/{story-id}-plan.json` y extrae `testScenarios` array.
+    -   Si existe `selectedScenarioIds`, reporta los casos seleccionados como ejecutados y los restantes como omitidos; no los cuentes como fallidos.
     -   Mapea cada resultado en `detailedResults` con su escenario usando ID.
+    -   Para cada escenario ejecutado, agrega en su fila un enlace visible a su screenshot y una miniatura o acceso ampliable. Incluye además todas las capturas por caso en la galería con leyenda y texto alternativo que identifiquen el escenario, resultado, navegador e intento. Para un fallo, prioriza la captura tomada al ocurrir el error y enlázala también desde el bug correspondiente cuando exista.
 
 5.  **Aplicar Reglas de Fallos Automáticos**:
     -   ❌ Si **algún Lighthouse < 80** (cualquier categoría): marcar como FAIL
@@ -59,7 +62,7 @@ Esta habilidad consolida **TODOS** los outputs de las habilidades ejecutadas:
     -   Lee `templates/test-report-template.html`.
     -   Reemplaza placeholders con:
         - Información de historia (URL, Title, Story ID)
-        - Tabla `detailedResults` con todas las filas consolidadas
+        - Tabla `detailedResults` con todas las filas consolidadas; rellena `{{screenshotLink}}` con un enlace y miniatura a la captura del caso, o con una advertencia breve si no existe.
         - Sección de Bugs con enlace a cada evidencia
         - Sección de Accesibilidad con resumen por breakpoint
         - Sección de Lighthouse con gráficos de puntajes
@@ -88,6 +91,9 @@ Esta habilidad consolida **TODOS** los outputs de las habilidades ejecutadas:
 
 11. **Escribir Archivo HTML**:
     -   Guarda a `3-outputs/run/{story-id}/test-report.html`
+  -   Deriva el nombre del proyecto de los datos de la ejecución/historia (campo `Nombre del Proyecto`), no del nombre de otra historia ni de un título fijo. Úsalo en `<title>` y `<h1>` con el formato `Reporte de Pruebas E2E — {Nombre del Proyecto}`.
+  -   Incluye las capturas existentes de `execution/`, `accessibility/` y `lighthouse/` en la galería del reporte, con enlaces ampliables, texto alternativo y leyenda que indique caso y viewport. Usa rutas servidas por el runner (`/reports/{story-id}/assets/{ruta-relativa}`). No presentes una captura como evidencia de un comportamiento que no muestra.
+  -   Si algún escenario ejecutado carece de captura, genera el reporte de todos modos y registra la ausencia como advertencia visible. Cada fila funcional debe enlazar a su propia evidencia en `/reports/{story-id}/assets/{ruta-relativa}`; verifica que la ruta y el archivo existan.
 
 12. **Actualizar Memoria del Producto**:
     -   Basado en bugs encontrados y áreas inestables, actualiza:
@@ -144,7 +150,7 @@ El reporte final debe destacar claramente cualquier bug encontrado:
    - Lista de todos los bugs con descripción completa
    - Pasos de reproducción
    - Severidad visual (colores)
-   - JIRA key (si está disponible)
+  - ID y URL del Bug en Azure DevOps (si está disponible)
    - Enlaces directos a evidencia
 
 3. **Cálculo de Veredicto**:
@@ -160,6 +166,7 @@ El reporte final debe destacar claramente cualquier bug encontrado:
 ## Criterios de Finalización
 
 - ✅ `test-report.html` es generado y es un archivo visualizable autocontenido.
+- ✅ Cada resultado funcional ejecutado tiene enlace a su propia screenshot, y las capturas de fallos se enlazan desde el bug correspondiente cuando exista.
 - ✅ Tabla `detailedResults` consolidada incluye items de TODOS los skills (Funcional, Accesibilidad, Lighthouse, Visual, Bugs).
 - ✅ Sección de Bugs muestra todos los items del archivo `{story-id}-bugs.json` con severidad y enlaces a evidencia.
 - ✅ Tabla de Resumen Sumaria tiene 4 columnas: Tipo, Ejecutado, Pasados, Fallidos.

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">Test Executor and Automator</title><desc id="desc">Laptop con engranaje de automatización y validación</desc>
+  <rect width="160" height="160" rx="32" fill="#f5f7f5"/>
+  <rect x="22" y="62" width="116" height="72" rx="12" fill="#61c8df" stroke="#101820" stroke-width="9"/>
+  <rect x="30" y="72" width="100" height="55" fill="#72d5e8"/>
+  <path d="M12 134h136v12c0 7-6 12-13 12H25c-7 0-13-5-13-12z" fill="#a9b4be" stroke="#101820" stroke-width="9"/>
+  <path d="M50 150h8M74 150h8M98 150h8" stroke="#101820" stroke-width="7"/>
+  <path d="M94 18l8 13 16-1 5 15 15 6-5 15 10 12-11 11 5 15-15 6-5 15-16-2-9 13-14-8-14 8-9-13-16 2-5-15-15-6 5-15-11-11 10-12-5-15 15-6 5-15 16 1 8-13 14 8z" fill="#ffd22f" stroke="#101820" stroke-width="8" stroke-linejoin="round"/>
+  <circle cx="88" cy="63" r="27" fill="#fff" stroke="#101820" stroke-width="8"/>
+  <circle cx="88" cy="63" r="9" fill="#101820"/>
+  <path d="M49 101l13 12 24-25" fill="none" stroke="#101820" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M102 103l18 18M120 103l-18 18" stroke="#f36f63" stroke-width="8" stroke-linecap="round"/>
+</svg>

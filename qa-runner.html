@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Executor &amp; Automator | Pruebas TI</title>
+  <link rel="icon" href="/grupo-sid-logo.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --bg: #edf6f4;
+      --panel: #f5fbfa;
+      --surface: #ffffff;
+      --surface-alt: #eaf5f1;
+      --line: #d6e6e2;
+      --green-900: #0b3b34;
+      --green-700: #0f5248;
+      --green-500: #1d7b68;
+      --blue-900: #0d2c4f;
+      --blue-700: #134a82;
+      --blue-500: #3e7bd6;
+      --text: #172d39;
+      --text-soft: #344c5a;
+      --text-muted: #4c6270;
+      --success: #1c8a69;
+      --warning: #cf8e24;
+      --danger: #d64d4d;
+      --shadow: rgba(10, 31, 41, 0.12);
+      --brand: linear-gradient(135deg, var(--green-900), var(--blue-900));
+      color: var(--text); background: var(--bg); font-family: Inter, "Segoe UI", sans-serif; font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; padding: 0 0 78px; background: linear-gradient(180deg, #edf6f4 0%, #f8fbfd 100%); }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    [hidden] { display: none !important; }
+    .topbar { position: sticky; z-index: 5; top: 0; display: grid; grid-template-columns: minmax(210px, 1fr) auto minmax(145px, 1fr); align-items: center; gap: 18px; min-height: 64px; padding: 9px 20px; border-bottom: 1px solid var(--line); background: linear-gradient(90deg, rgba(8,52,45,0.98), rgba(11,44,78,0.96)); box-shadow: 0 8px 18px rgba(10,31,41,0.08); }
+    .brand-lockup { display: flex; min-width: 0; align-items: center; gap: 12px; }
+    .brand { width: 110px; height: auto; max-height: 38px; object-fit: contain; filter: drop-shadow(0 3px 12px rgba(0, 0, 0, 0.15)); }
+    .brand-title { min-width: 0; }
+    .brand-title strong { display: block; color: #edf8ff; font-size: 13px; line-height: 1.25; }
+    .eyebrow { display: flex; align-items: center; gap: 7px; margin-bottom: 2px; color: #d5f6e5; font-size: 10px; font-weight: 900; letter-spacing: .08em; }
+    .version { padding: 2px 5px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; color: #dcfef2; background: rgba(255,255,255,0.06); font-size: 8px; letter-spacing: 0; }
+    .stepper { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+    .step-item { display: flex; align-items: center; gap: 6px; padding: 5px 9px; border: 1px solid rgba(255,255,255,0.15); border-radius: 18px; background: rgba(255,255,255,0.06); color: #dceaf9; font-size: 10px; }
+    .step-item.active { border-color: rgba(121, 196, 255, 0.65); background: rgba(147, 211, 255, 0.18); color: #f2faff; }
+    .step-item.complete { background: rgba(24, 157, 120, 0.18); color: #dffcf3; }
+    .step-number { display: grid; width: 15px; height: 15px; place-items: center; border-radius: 50%; background: rgba(255,255,255,0.15); font-size: 8px; font-weight: 800; }
+    .step-item.active .step-number { background: #8ed0ff; color: var(--blue-900); }
+    .step-item.complete .step-number { background: #a4f0cf; color: var(--green-900); }
+    .step-chevron { color: rgba(255,255,255,0.6); }
+    .ado-sync { justify-self: end; color: #ebf5ff; font-size: 9px; white-space: nowrap; }
+    .sync-dot, .live-dot { display: inline-block; width: 7px; height: 7px; margin-right: 5px; border-radius: 50%; background: #57d4a4; }
+    .workspace { width: min(1600px, 100%); margin: 0 auto; padding: 14px 20px 24px; }
+    .setup { max-width: 940px; margin: 30px auto; padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,0.9); box-shadow: 0 6px 20px rgba(14, 34, 48, 0.08); }
+    .step-label { margin: 0 0 7px; color: var(--green-700); font-size: 9px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    h2 { margin: 0 0 8px; color: var(--blue-900); font-size: 18px; }
+    .intro { margin: 0 0 17px; color: var(--text-soft); font-size: 12px; line-height: 1.5; }
+    .setup-form { display: grid; grid-template-columns: minmax(120px, .55fr) minmax(240px, 1.4fr) auto; align-items: end; gap: 12px; }
+    label { color: var(--text-soft); font-size: 11px; font-weight: 700; }
+    .setup-form input, select, .search-box { width: 100%; min-width: 0; margin-top: 5px; padding: 9px 10px; border: 1px solid #cfe3db; border-radius: 6px; outline: none; background: #fff; color: var(--text); font-size: 12px; }
+    input:focus, select:focus { border-color: var(--blue-500); box-shadow: 0 0 0 3px rgba(62,123,214,0.12); }
+    .primary-button, .quiet-button, .filter-chip { display: inline-flex; min-height: 32px; align-items: center; justify-content: center; gap: 6px; padding: 7px 11px; border: 1px solid rgba(12,57,48,0.18); border-radius: 5px; background: #fff; color: var(--text-soft); font-size: 10px; font-weight: 700; transition: .15s ease; }
+    .primary-button { min-height: 37px; border-color: var(--green-700); background: linear-gradient(135deg, var(--green-700), var(--blue-900)); color: #fff; }
+    .primary-button:hover:not(:disabled) { background: linear-gradient(135deg, var(--green-900), var(--blue-700)); }
+    button:hover:not(:disabled), .quiet-button:hover { border-color: rgba(10,59,52,0.2); background: #f0faf7; color: var(--green-900); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .environment-card { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 13px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,0.95); }
+    .test-type-picker { display: grid; grid-template-columns: minmax(150px, .7fr) repeat(3, minmax(150px, 1fr)); align-items: center; gap: 8px; margin-bottom: 13px; padding: 11px 13px; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,0.95); }
+    .test-type-heading strong { display: block; color: var(--blue-900); font-size: 10px; }
+    .test-type-heading span { display: block; margin-top: 3px; color: var(--text-muted); font-size: 9px; line-height: 1.4; }
+    .test-type-option { display: flex; min-height: 40px; align-items: center; gap: 7px; padding: 7px 9px; border: 1px solid #e1ece8; border-radius: 6px; background: #f8fbfa; color: var(--text-soft); font-size: 10px; font-weight: 700; cursor: pointer; }
+    .test-type-option:has(input:checked) { border-color: rgba(15,82,72,.35); background: #eaf7f1; color: var(--green-900); }
+    .test-type-option input { flex: 0 0 auto; width: 14px; height: 14px; margin: 0; accent-color: var(--green-700); }
+    .environment-main { display: grid; min-width: 0; gap: 7px; }
+    .story-line, .host-line { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+    .story-id { color: var(--green-700); font-size: 10px; font-weight: 800; }
+    .story-name { color: var(--blue-900); font-size: 11px; font-weight: 700; }
+    .host-label { color: var(--text-muted); font-size: 10px; }
+    .host-line a { max-width: min(52vw, 560px); overflow: hidden; padding: 4px 7px; border: 1px solid #dfece8; border-radius: 4px; background: #f3faf7; color: var(--blue-700); font: 10px ui-monospace, Consolas, monospace; text-overflow: ellipsis; white-space: nowrap; }
+    .health-pill { display: inline-flex; align-items: center; padding: 4px 7px; border: 1px solid rgba(17, 137, 100, 0.2); border-radius: 12px; background: rgba(16, 122, 90, 0.08); color: var(--success); font-size: 9px; white-space: nowrap; }
+    .health-pill.warning { border-color: rgba(207,142,36,0.2); background: rgba(207,142,36,0.08); color: var(--warning); }
+    .health-pill .live-dot { width: 6px; height: 6px; margin-right: 4px; }
+    .manual-login { display: inline-flex; align-items: center; margin-top: 2px; color: var(--blue-700); font-size: 9px; font-weight: 700; }
+    .credential-note { margin: 0; color: var(--text-muted); font-size: 10px; }
+    .env-actions { display: flex; flex: 0 0 auto; gap: 6px; }
+    .board-grid { display: grid; grid-template-columns: minmax(0, 1.95fr) minmax(280px, .95fr); align-items: stretch; gap: 13px; }
+    .scenario-panel, .detail-panel { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: rgba(255,255,255,0.96); }
+    .scenario-panel { display: flex; min-height: min(555px, calc(100vh - 230px)); flex-direction: column; }
+    .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 13px 13px 9px; }
+    .panel-title { display: flex; align-items: center; gap: 8px; color: var(--blue-900); font-size: 10px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+    .case-count { padding: 3px 7px; border-radius: 10px; background: #edf6fb; color: var(--blue-700); font-size: 9px; font-weight: 700; letter-spacing: 0; text-transform: none; }
+    .search-box { width: min(200px, 44%); margin: 0; padding: 7px 9px; font-size: 10px; }
+    .filter-row { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; padding: 0 13px 9px; }
+    .filter-chip { min-height: 25px; padding: 4px 8px; font-size: 9px; }
+    .filter-chip.active { border-color: rgba(13,44,79,0.2); background: rgba(19,74,130,0.08); color: var(--blue-900); }
+    .filter-chip.negative, .filter-chip.danger { color: var(--danger); }
+    .scenario-filters { display: flex; gap: 6px; padding: 0 13px 9px; }
+    .scenario-filters label { display: flex; align-items: center; gap: 4px; color: var(--text-soft); font-size: 9px; }
+    .scenario-filters select { width: auto; max-width: 150px; margin: 0; padding: 4px 6px; font-size: 9px; }
+    .table-head, .scenario-row { display: grid; grid-template-columns: 22px minmax(130px, 1.7fr) 72px minmax(88px, 1fr) minmax(75px, .9fr) 82px; align-items: center; gap: 8px; }
+    .table-head { min-height: 32px; padding: 0 11px; border-top: 1px solid #ebf3f0; border-bottom: 1px solid #dfece9; background: #f3faf7; color: var(--text-soft); font-size: 8px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+    .table-head input, .scenario-row input { width: 13px; height: 13px; margin: 0; accent-color: var(--green-700); }
+    .scenario-list { display: block; max-height: none; flex: 1; overflow: auto; margin: 0; padding: 0; list-style: none; }
+    .scenario-row { min-height: 47px; padding: 6px 11px; border: 0; border-bottom: 1px solid #eef5f2; border-left: 2px solid transparent; background: #fff; cursor: pointer; }
+    .scenario-row:hover { background: #f2faf9; }
+    .scenario-row.selected { border-left-color: var(--green-700); background: #eefaf5; }
+    .case-name { min-width: 0; overflow: hidden; color: var(--text); font-size: 9px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+    .case-name small { display: block; margin-bottom: 2px; color: var(--blue-700); font: 9px ui-monospace, Consolas, monospace; }
+    .cell-chip { justify-self: start; max-width: 100%; overflow: hidden; padding: 3px 5px; border: 1px solid #e7f0ea; border-radius: 4px; background: #f7fbfa; color: var(--text-soft); font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+    .cell-chip.sev-critical, .cell-chip.sev-high { border-color: rgba(214,77,77,0.2); background: rgba(214,77,77,0.08); color: var(--danger); }
+    .cell-chip.sev-medium { border-color: rgba(207,142,36,0.2); background: rgba(207,142,36,0.08); color: var(--warning); }
+    .cell-chip.sev-low { background: rgba(12,44,79,0.04); color: var(--blue-700); }
+    .automation { overflow: hidden; color: var(--green-700); font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+    .automation.manual { color: var(--text-muted); }
+    .detail-panel { display: flex; min-height: min(555px, calc(100vh - 230px)); flex-direction: column; }
+    .detail-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 13px; border-bottom: 1px solid #ebf4f0; color: var(--blue-900); font-size: 9px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+    .detail-case-id { padding: 3px 6px; border: 1px solid #dfece9; border-radius: 4px; color: var(--blue-700); font: 8px ui-monospace, Consolas, monospace; letter-spacing: 0; }
+    .detail-body { overflow: auto; padding: 12px; }
+    .detail-title { margin: 0 0 8px; color: var(--blue-900); font-size: 12px; line-height: 1.4; }
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 11px; }
+    .detail-section { margin-top: 12px; }
+    .detail-section h4 { margin: 0 0 5px; color: var(--green-700); font-size: 8px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .detail-section p, .detail-section li { color: var(--text-soft); font-size: 9px; line-height: 1.5; }
+    .detail-section p { margin: 0; }
+    .detail-section ol { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; counter-reset: detail-step; }
+    .detail-section ol li { position: relative; min-height: 27px; padding: 6px 6px 6px 27px; border: 1px solid #e8f0ed; border-radius: 5px; background: #f8fbfa; counter-increment: detail-step; }
+    .detail-section ol li::before { position: absolute; top: 6px; left: 6px; display: grid; width: 14px; height: 14px; place-items: center; border: 1px solid #dbeae4; border-radius: 4px; background: #fff; color: var(--blue-700); content: counter(detail-step); font-size: 7px; }
+    .detail-callout { padding: 8px; border: 1px solid rgba(18, 121, 96, 0.2); border-radius: 6px; background: rgba(31, 149, 116, 0.07); }
+    .detail-callout h4 { color: var(--green-700); }
+    .detail-empty { display: grid; min-height: 220px; place-items: center; padding: 22px; color: var(--text-muted); text-align: center; font-size: 11px; line-height: 1.5; }
+    .techniques { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,0.9); }
+    .techniques h3 { margin: 0 0 7px; color: var(--blue-900); font-size: 9px; }
+    .techniques ul { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; }
+    .techniques li { padding: 4px 7px; border-radius: 4px; background: #edf6f4; color: var(--blue-700); font-size: 8px; }
+    .confirm { display: none; }
+    .board-footer { position: fixed; z-index: 6; right: 0; bottom: 0; left: 0; display: flex; min-height: 58px; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 18px; border-top: 1px solid var(--line); background: linear-gradient(90deg, rgba(10,52,45,0.98), rgba(10,39,64,0.97)); box-shadow: 0 -5px 16px rgba(10,31,41,0.12); }
+    .footer-selection, .browser-group, .footer-actions { display: flex; align-items: center; gap: 7px; }
+    .footer-selection { min-width: 150px; color: #eafaf6; font-size: 8px; white-space: nowrap; }
+    .selected-dot { width: 7px; height: 7px; border-radius: 50%; background: #6fe0b2; }
+    .footer-separator { width: 1px; height: 17px; background: rgba(255,255,255,0.18); }
+    .estimate, .browser-label { color: #dfeefd; font-size: 8px; white-space: nowrap; }
+    .browser-option { display: inline-flex; min-height: 26px; align-items: center; padding: 4px 7px; border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; color: #edf7ff; font-size: 8px; cursor: pointer; background: rgba(255,255,255,0.04); }
+    .browser-option:has(input:checked) { border-color: rgba(166, 221, 255, 0.5); background: rgba(150,206,255,0.16); color: #fff; }
+    .browser-option input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .footer-actions { margin-left: auto; }
+    #run-reviewed { width: auto; min-height: 32px; padding: 7px 12px; border-radius: 6px; background: linear-gradient(135deg, #1e9a74, #105d89); font-size: 8px; white-space: nowrap; color: #fff; }
+    #run-reviewed:hover:not(:disabled) { background: linear-gradient(135deg, #1b876c, #0f4f7d); }
+    #status { position: fixed; z-index: 8; right: 18px; bottom: 70px; width: min(440px, calc(100vw - 36px)); margin: 0; padding: 10px 12px; border-radius: 7px; box-shadow: 0 8px 25px rgba(13,44,79,0.12); }
+    .footer { display: none; }
+    @media (max-width: 950px) { .test-type-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); } .test-type-heading { grid-column: 1 / -1; } }
+    @media (max-width: 950px) { .topbar { grid-template-columns: minmax(170px, 1fr) auto; } .stepper { grid-column: 1 / -1; grid-row: 2; justify-self: center; } .ado-sync { grid-column: 2; grid-row: 1; } .board-grid { grid-template-columns: minmax(0, 1.5fr) minmax(240px, .9fr); } .table-head, .scenario-row { grid-template-columns: 18px minmax(105px, 1.5fr) 65px minmax(70px, 1fr) 70px; } .table-head > :nth-child(5), .scenario-row > :nth-child(5) { display: none; } }
+    @media (max-width: 680px) { body { padding-bottom: 132px; } .topbar { position: static; grid-template-columns: 1fr auto; gap: 8px; padding: 9px 11px; } .stepper { width: 100%; justify-content: center; gap: 3px; overflow: auto; } .step-item { padding: 5px 6px; font-size: 7px; } .ado-sync { font-size: 7px; } .workspace { padding: 9px; } .setup { margin: 12px 0; padding: 14px; } .setup-form { grid-template-columns: 1fr; } .environment-card { align-items: flex-start; flex-direction: column; padding: 11px; } .env-actions { align-self: stretch; } .env-actions button { flex: 1; } .host-line a { max-width: 65vw; } .test-type-picker { grid-template-columns: 1fr; } .test-type-heading { grid-column: auto; } .board-grid { grid-template-columns: 1fr; } .scenario-panel { min-height: 400px; } .detail-panel { min-height: 260px; } .panel-head { align-items: flex-start; flex-direction: column; } .search-box { width: 100%; } .scenario-filters { flex-wrap: wrap; } .table-head, .scenario-row { grid-template-columns: 17px minmax(98px, 1fr) 59px 74px; gap: 5px; padding-right: 7px; padding-left: 7px; } .table-head > :nth-child(4), .scenario-row > :nth-child(4), .table-head > :nth-child(5), .scenario-row > :nth-child(5) { display: none; } .board-footer { min-height: 122px; align-items: flex-start; flex-direction: column; gap: 6px; padding: 7px 9px; } .footer-selection { min-width: 0; } .footer-actions { width: 100%; } .footer-actions button { flex: 1; } #run-reviewed { flex: 1.2; } #status { right: 9px; bottom: 130px; width: calc(100vw - 18px); } }
+    @media (max-width: 680px) { .step-item, .ado-sync { font-size: 8px; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="topbar">
+      <div class="brand-lockup">
+        <img class="brand" src="/grupo-sid-logo.svg?v=2" alt="Grupo SID">
+        <div class="brand-title">
+          <div class="eyebrow">Pruebas TI <span class="version">v2.4</span></div>
+          <strong>Test Executor &amp; Automator</strong>
+        </div>
+      </div>
+      <nav class="stepper" aria-label="Progreso de ejecución"><span id="step-connection" class="step-item active"><span class="step-number">1</span> Conexión &amp; Ambiente</span><span class="step-chevron">›</span><span id="step-cases" class="step-item"><span class="step-number">2</span> Selección de Casos</span><span class="step-chevron">›</span><span id="step-execution" class="step-item"><span class="step-number">3</span> Ejecución &amp; Resultados</span></nav>
+      <div class="ado-sync"><span class="sync-dot"></span>Sync activo con DevOps</div>
+    </header>
+    <div class="workspace">
+      <section id="setup" class="setup">
+        <p class="step-label">Paso 1 · Conexión &amp; Ambiente</p><h2>Conecta la historia y el host de pruebas</h2><p class="intro">Valida el ambiente y prepara los escenarios antes de ejecutar la suite.</p>
+        <form id="run-form" class="setup-form">
+          <div><label for="task-id">Tarea de Azure DevOps</label><input id="task-id" name="taskId" inputmode="numeric" pattern="[0-9]+" placeholder="Ej. 78" required autofocus></div>
+          <div><label for="test-url">Host de pruebas</label><input id="test-url" name="testUrl" type="url" placeholder="https://sitio-de-pruebas/" required></div>
+          <div><button id="prepare-button" class="primary-button" type="submit">Validar conexión y cargar casos</button></div>
+        </form>
+      </section>
+      <section id="review" class="review" hidden aria-live="polite">
+        <div class="environment-card"><div class="environment-main"><div class="story-line"><span id="story-id" class="story-id">▤ US-—</span><span id="project-name" class="story-name">Proyecto pendiente</span></div><div class="host-line"><span class="host-label">Host de pruebas:</span><a id="test-link" target="_blank" rel="noopener noreferrer">Sin validar</a><span id="health-state" class="health-pill warning"><span class="live-dot"></span><span id="access-state">Esperando validación</span></span></div><a id="manual-login" class="manual-login" target="_blank" rel="noopener noreferrer" hidden>Abrir portal para iniciar sesión ↗</a><p id="credential-note" class="credential-note" hidden>Ingresa tus credenciales directamente en el portal; no las compartas con el QA Runner.</p></div><div class="env-actions"><button id="edit-variables" class="quiet-button" type="button">⚙ Editar variables</button></div></div>
+        <section class="test-type-picker" aria-labelledby="test-type-title"><div class="test-type-heading"><strong id="test-type-title">Modalidades de prueba</strong><span>Elige una o más auditorías para esta ejecución.</span></div><label class="test-type-option"><input type="checkbox" name="test-type" value="functional" checked>Funcionales · casos seleccionados</label><label class="test-type-option"><input type="checkbox" name="test-type" value="accessibility">Accesibilidad · WCAG 2.1 AA</label><label class="test-type-option"><input type="checkbox" name="test-type" value="performance">Rendimiento · Lighthouse</label></section>
+        <div class="board-grid">
+          <section class="scenario-panel" aria-label="Escenarios disponibles"><div class="panel-head"><div class="panel-title">Escenarios disponibles <span id="scenario-count" class="case-count"></span></div><input id="filter-search" class="search-box" type="search" placeholder="⌕ Filtrar por ID, título o técnica..."></div><div id="quick-filters" class="filter-row" aria-label="Filtros rápidos"></div><div class="scenario-filters" aria-label="Filtros adicionales"><label for="filter-severity">Severidad<select id="filter-severity"><option value="all">Todas</option></select></label><label for="filter-type">Clasificación<select id="filter-type"><option value="all">Todas</option></select></label><label for="filter-polarity">Polaridad<select id="filter-polarity"><option value="all">Ambas</option><option value="Positivo">Positivos</option><option value="Negativo">Negativos</option><option value="Sin clasificar">Sin clasificar</option></select></label></div><div class="table-head" role="row"><input id="select-visible" type="checkbox" aria-label="Seleccionar casos visibles"><span>ID / Escenario</span><span>Severidad</span><span>Técnica ISTQB</span><span>Clasificación</span><span>Automatización</span></div><div id="scenario-list" class="scenario-list" role="list" aria-label="Lista de casos de prueba"></div></section>
+          <aside class="detail-panel" aria-label="Detalle del caso seleccionado"><div class="detail-head"><span><span class="live-dot" style="background:#6257f5"></span> Detalle del caso seleccionado</span><span id="detail-case-id" class="detail-case-id">—</span></div><div id="selected-detail" class="detail-body"><div class="detail-empty">Selecciona un escenario para revisar sus prerrequisitos, pasos y resultado esperado.</div></div></aside>
+        </div>
+        <section class="techniques" aria-labelledby="techniques-title"><h3 id="techniques-title">Técnicas ISTQB aplicables</h3><ul id="technique-list"></ul></section>
+      </section>
+    </div>
+    <div class="board-footer" id="board-footer" hidden><div class="footer-selection"><span class="selected-dot"></span><strong id="selection-count">0 casos seleccionados</strong><span class="footer-separator"></span><span id="estimate" class="estimate">Tiempo estimado: —</span></div><div class="browser-group" aria-label="Navegadores seleccionados para pruebas funcionales"><span class="browser-label">Navegadores funcionales:</span><label class="browser-option"><input type="checkbox" name="browser" value="chromium" checked>Chromium</label><label class="browser-option"><input type="checkbox" name="browser" value="firefox">Firefox</label><label class="browser-option"><input type="checkbox" name="browser" value="webkit">WebKit</label></div><div class="footer-actions"><button id="run-reviewed" class="primary-button" type="button" disabled>▶ Ejecutar pruebas</button></div></div>
+    <div id="status" hidden role="status" aria-live="polite"></div>
+  </main>
+  <script>
+    const form = document.querySelector('#run-form');
+    const setup = document.querySelector('#setup');
+    const taskInput = document.querySelector('#task-id');
+    const testUrlInput = document.querySelector('#test-url');
+    const prepareButton = document.querySelector('#prepare-button');
+    const runButton = document.querySelector('#run-reviewed');
+    const status = document.querySelector('#status');
+    const review = document.querySelector('#review');
+    const footer = document.querySelector('#board-footer');
+    const scenarioList = document.querySelector('#scenario-list');
+    const severityFilter = document.querySelector('#filter-severity');
+    const typeFilter = document.querySelector('#filter-type');
+    const polarityFilter = document.querySelector('#filter-polarity');
+    const searchInput = document.querySelector('#filter-search');
+    const quickFilters = document.querySelector('#quick-filters');
+    const selectedDetail = document.querySelector('#selected-detail');
+    const selectVisible = document.querySelector('#select-visible');
+    const selectionCount = document.querySelector('#selection-count');
+    const stepConnection = document.querySelector('#step-connection');
+    const stepCases = document.querySelector('#step-cases');
+    const stepExecution = document.querySelector('#step-execution');
+    let busy = false;
+    let timer;
+    let currentPlan = null;
+    let activeQuickFilter = 'all';
+    function show(message, error = false) { status.hidden = false; status.className = error ? 'error' : ''; status.textContent = message; }
+    function setStage(stage) { [[stepConnection, 1], [stepCases, 2], [stepExecution, 3]].forEach(([item, number]) => { item.classList.toggle('active', number === stage); item.classList.toggle('complete', number < stage); }); }
+    function setBusy(value) { busy = value; prepareButton.disabled = value; updateSelection(); }
+    function getCaseId(scenario, index) { return scenario.id || `SC_${String(index + 1).padStart(3, '0')}`; }
+    function getPolarity(scenario) { const value = String(scenario.testPolarity || scenario.polarity || '').toLocaleLowerCase('es'); return value === 'positivo' || value === 'positive' ? 'Positivo' : value === 'negativo' || value === 'negative' ? 'Negativo' : 'Sin clasificar'; }
+    function severityClass(value) { const normalized = String(value || '').toLocaleLowerCase('es'); return /crít|crit/.test(normalized) ? 'sev-critical' : /alta|high/.test(normalized) ? 'sev-high' : /media|medium/.test(normalized) ? 'sev-medium' : 'sev-low'; }
+    function buildSteps(scenario) { if (Array.isArray(scenario.steps) && scenario.steps.length) return scenario.steps.map(step => typeof step === 'string' ? step.replace(/^\s*\d+[.)]\s*/, '') : step.action || JSON.stringify(step)); const description = String(scenario.description || '').trim(); return description ? description.split(/\r?\n/).flatMap(line => line.split(/\s+(?=\d+[.)]\s)/)).map(step => step.replace(/^\s*\d+[.)]\s*/, '').trim()).filter(Boolean) : []; }
+    function makeTag(text, className = '') { const tag = document.createElement('span'); tag.className = `cell-chip ${className}`.trim(); tag.textContent = text; return tag; }
+    function addDetail(container, label, value) { if (value === undefined || value === null || value === '' || (Array.isArray(value) && !value.length)) return; const section = document.createElement('section'); section.className = 'detail-section'; const heading = document.createElement('h4'); heading.textContent = label; const content = document.createElement('p'); content.textContent = Array.isArray(value) ? value.join(' · ') : String(value); section.append(heading, content); container.append(section); }
+    function renderDetail(scenario, index) {
+      const detailId = document.querySelector('#detail-case-id');
+      if (!scenario) { selectedDetail.innerHTML = '<div class="detail-empty">Selecciona un escenario para ver su especificación.</div>'; detailId.textContent = '—'; return; }
+      detailId.textContent = getCaseId(scenario, index); selectedDetail.replaceChildren();
+      const title = document.createElement('h3'); title.className = 'detail-title'; title.textContent = scenario.title || 'Escenario sin título'; selectedDetail.append(title);
+      const tags = document.createElement('div'); tags.className = 'detail-tags';
+      const polarity = getPolarity(scenario); tags.append(makeTag(polarity, polarity === 'Positivo' ? 'polarity-positive' : polarity === 'Negativo' ? 'polarity-negative' : ''), makeTag(`Tipo: ${scenario.testType || 'Sin clasificar'}`), makeTag(`Severidad: ${scenario.severity || 'Sin clasificar'}`, severityClass(scenario.severity)));
+      (scenario.requirementRefs || []).forEach(ref => tags.append(makeTag(ref))); selectedDetail.append(tags);
+      addDetail(selectedDetail, 'Prerrequisitos', scenario.prerequisites); addDetail(selectedDetail, 'Ambigüedades y supuestos', scenario.ambiguitiesAndAssumptions);
+      const steps = buildSteps(scenario);
+      if (steps.length) { const section = document.createElement('section'); section.className = 'detail-section'; const heading = document.createElement('h4'); heading.textContent = 'Pasos de ejecución (Test Steps)'; const list = document.createElement('ol'); steps.forEach(step => { const li = document.createElement('li'); li.textContent = step; list.append(li); }); section.append(heading, list); selectedDetail.append(section); }
+      const expected = document.createElement('section'); expected.className = 'detail-section detail-callout'; const expectedHeading = document.createElement('h4'); expectedHeading.textContent = 'Resultado esperado (Assertion)'; const expectedText = document.createElement('p'); expectedText.textContent = scenario.expectedResult || 'No definido en el plan; requiere aclaración.'; expected.append(expectedHeading, expectedText); selectedDetail.append(expected);
+      addDetail(selectedDetail, 'Impacto', scenario.severityRationale); addDetail(selectedDetail, 'Técnica ISTQB', scenario.technique);
+    }
+    function renderPlan(data, id) {
+      currentPlan = data.plan; const scenarios = currentPlan.testScenarios || []; setup.hidden = true; review.hidden = false; footer.hidden = false; setStage(2);
+      const selectedTestTypes = Array.isArray(currentPlan.selectedTestTypes) ? currentPlan.selectedTestTypes : ['functional']; document.querySelectorAll('input[name="test-type"]').forEach(input => { input.checked = selectedTestTypes.includes(input.value); });
+      document.querySelector('#story-id').textContent = `▤ US-${id}`; document.querySelector('#project-name').textContent = currentPlan.projectName || currentPlan.storyTitle || `Historia US-${id}`; document.querySelector('#scenario-count').textContent = `${scenarios.length} casos`;
+      const link = document.querySelector('#test-link'); link.href = data.access.url; link.textContent = data.access.url; updateHealth(data.access);
+      document.querySelector('#manual-login').href = data.access.url; document.querySelector('#manual-login').hidden = !(data.access.warning || data.access.protected); document.querySelector('#credential-note').hidden = !(data.access.warning || data.access.protected);
+      scenarioList.replaceChildren(); const severities = new Set(); const types = new Set();
+      scenarios.forEach((scenario, index) => {
+        const caseId = getCaseId(scenario, index); const polarity = getPolarity(scenario); const severity = scenario.severity || 'Sin clasificar'; const type = scenario.testType || 'Sin clasificar'; severities.add(severity); types.add(type);
+        const row = document.createElement('div'); row.className = 'scenario-row'; row.dataset.caseId = caseId; row.dataset.title = scenario.title || ''; row.dataset.severity = severity; row.dataset.testType = type; row.dataset.polarity = polarity; row.dataset.technique = scenario.technique || ''; row.dataset.index = String(index); row.dataset.minutes = scenario.estimatedDurationMinutes ?? scenario.durationMinutes ?? '';
+        const check = document.createElement('input'); check.type = 'checkbox'; check.className = 'scenario-select'; check.value = caseId; check.checked = true; check.setAttribute('aria-label', `Seleccionar ${caseId}: ${scenario.title || 'escenario'}`); check.addEventListener('click', event => event.stopPropagation());
+        const name = document.createElement('span'); name.className = 'case-name'; const idText = document.createElement('small'); idText.textContent = caseId; const titleText = document.createElement('span'); titleText.textContent = scenario.title || 'Escenario sin título'; name.append(idText, titleText);
+        const automation = scenario.automationType || scenario.automationStrategy || scenario.automation || 'Por definir'; const automationCell = document.createElement('span'); automationCell.className = `automation${automation === 'Por definir' || automation === 'Manual' ? ' manual' : ''}`; automationCell.textContent = `● ${automation}`;
+        row.append(check, name, makeTag(severity, severityClass(severity)), makeTag(scenario.technique || 'No definida'), makeTag(type), automationCell); row.addEventListener('click', () => selectScenario(row)); scenarioList.append(row);
+      });
+      populateFilter(severityFilter, severities, 'Todas'); populateFilter(typeFilter, types, 'Todos'); severityFilter.value = 'all'; typeFilter.value = 'all'; polarityFilter.value = 'all'; searchInput.value = ''; activeQuickFilter = 'all'; renderQuickFilters();
+      if (scenarios.length) renderDetail(scenarios[0], 0); else renderDetail(null); scenarioList.querySelector('.scenario-row')?.classList.add('selected');
+      const techniques = document.querySelector('#technique-list'); techniques.replaceChildren(); (currentPlan.testTechniques || []).forEach(technique => { const li = document.createElement('li'); li.textContent = typeof technique === 'string' ? technique : technique.name; if (typeof technique === 'object' && technique.justification) li.title = technique.justification; techniques.append(li); }); document.querySelector('.techniques').hidden = !(currentPlan.testTechniques || []).length;
+      document.querySelectorAll('input[name="browser"]').forEach(browser => { browser.checked = (currentPlan.selectedBrowsers || ['chromium']).includes(browser.value); }); updateSelection(); status.hidden = true;
+    }
+    function selectScenario(row) { scenarioList.querySelectorAll('.scenario-row').forEach(item => item.classList.toggle('selected', item === row)); const index = Number(row.dataset.index); renderDetail(currentPlan.testScenarios[index], index); }
+    function updateHealth(access) { const pill = document.querySelector('#health-state'); pill.classList.toggle('warning', Boolean(access.warning || access.protected)); document.querySelector('#access-state').textContent = access.warning || (access.protected ? `Autenticación requerida · HTTP ${access.status}` : `HTTP ${access.status} OK${access.latencyMs ? ` (${access.latencyMs}ms)` : ''}`); }
+    function populateFilter(select, values, label) { select.replaceChildren(new Option(label, 'all')); [...values].sort((a, b) => a.localeCompare(b, 'es')).forEach(value => select.add(new Option(value, value))); }
+    function renderQuickFilters() {
+      const rows = [...scenarioList.querySelectorAll('.scenario-row')]; const defs = [['all', `Todos (${rows.length})`], ['Positivo', `Positivos (${rows.filter(row => row.dataset.polarity === 'Positivo').length})`], ['Negativo', `Negativos (${rows.filter(row => row.dataset.polarity === 'Negativo').length})`], ['high', `Severidad Alta (${rows.filter(row => /alta|crít|crit/i.test(row.dataset.severity)).length})`], ['integration', `Integración (${rows.filter(row => /integraci/i.test(row.dataset.testType)).length})`]]; quickFilters.replaceChildren();
+      defs.forEach(([value, label]) => { const button = document.createElement('button'); button.type = 'button'; button.className = `filter-chip${value === 'Negativo' ? ' negative' : value === 'high' ? ' danger' : ''}${activeQuickFilter === value ? ' active' : ''}`; button.textContent = label; button.addEventListener('click', () => { activeQuickFilter = value; renderQuickFilters(); applyFilters(); }); quickFilters.append(button); });
+      const clear = document.createElement('button'); clear.type = 'button'; clear.className = 'filter-chip'; clear.style.marginLeft = 'auto'; clear.textContent = 'Deseleccionar todos'; clear.addEventListener('click', () => { scenarioList.querySelectorAll('.scenario-select').forEach(check => { check.checked = false; }); updateSelection(); }); quickFilters.append(clear);
+    }
+    function applyFilters() {
+      const query = searchInput.value.trim().toLocaleLowerCase('es');
+      scenarioList.querySelectorAll('.scenario-row').forEach(row => { const severity = severityFilter.value === 'all' || row.dataset.severity === severityFilter.value; const type = typeFilter.value === 'all' || row.dataset.testType === typeFilter.value; const polarity = polarityFilter.value === 'all' || row.dataset.polarity === polarityFilter.value; const quick = activeQuickFilter === 'all' || activeQuickFilter === 'high' && /alta|crít|crit/i.test(row.dataset.severity) || activeQuickFilter === 'integration' && /integraci/i.test(row.dataset.testType) || activeQuickFilter === row.dataset.polarity; const search = !query || `${row.dataset.caseId} ${row.dataset.title} ${row.dataset.testType} ${row.dataset.severity} ${row.dataset.technique}`.toLocaleLowerCase('es').includes(query); row.hidden = !(severity && type && polarity && quick && search); }); updateSelection();
+    }
+    function getSelectedTestTypes() { return [...document.querySelectorAll('input[name="test-type"]:checked')].map(input => input.value); }
+    function updateSelection() {
+      const checks = [...scenarioList.querySelectorAll('.scenario-select')]; const selected = checks.filter(check => check.checked); const polarities = new Set(selected.map(check => check.closest('.scenario-row').dataset.polarity)); const browsers = [...document.querySelectorAll('input[name="browser"]:checked')];
+      const functionalEnabled = getSelectedTestTypes().includes('functional');
+      checks.forEach(check => { check.disabled = !functionalEnabled; }); selectVisible.disabled = !functionalEnabled; document.querySelectorAll('input[name="browser"]').forEach(browser => { browser.disabled = !functionalEnabled; });
+      const selectedTypes = getSelectedTestTypes();
+      selectionCount.textContent = functionalEnabled ? `${selected.length} de ${checks.length} casos seleccionados` : selectedTypes.map(type => ({ accessibility: 'Accesibilidad', performance: 'Rendimiento' }[type] || type)).join(' + ') || 'Sin modalidad seleccionada'; const minutes = selected.map(check => check.closest('.scenario-row').dataset.minutes).filter(value => value !== '' && Number.isFinite(Number(value))).map(Number); document.querySelector('#estimate').textContent = functionalEnabled && minutes.length === selected.length && selected.length ? `Tiempo estimado: ${minutes.reduce((sum, value) => sum + value, 0)} min` : 'Tiempo estimado: —';
+      const visible = [...scenarioList.querySelectorAll('.scenario-row:not([hidden]) .scenario-select')]; selectVisible.checked = visible.length > 0 && visible.every(check => check.checked); selectVisible.indeterminate = visible.some(check => check.checked) && !selectVisible.checked;
+      const polarityComplete = !functionalEnabled || selected.length > 0 && polarities.has('Positivo') && polarities.has('Negativo') && !polarities.has('Sin clasificar'); const browsersComplete = !functionalEnabled || browsers.length > 0; runButton.disabled = busy || !selectedTypes.length || !polarityComplete || !browsersComplete; runButton.title = !selectedTypes.length ? 'Selecciona al menos una modalidad de prueba.' : !polarityComplete ? 'Para pruebas funcionales, selecciona al menos un caso positivo y uno negativo.' : !browsersComplete ? 'Selecciona al menos un navegador para las pruebas funcionales.' : '';
+    }
+    function buildGherkin() {
+      const selected = [...scenarioList.querySelectorAll('.scenario-select:checked')].map(check => { const row = check.closest('.scenario-row'); return { scenario: currentPlan.testScenarios[Number(row.dataset.index)], id: row.dataset.caseId }; }); const lines = ['# language: es', `Característica: ${currentPlan.projectName || currentPlan.storyTitle || 'Ejecución QA'}`, '  Como equipo de QA', '  Quiero validar los escenarios seleccionados', '  Para confirmar los criterios de aceptación', ''];
+      selected.forEach(({ scenario, id }) => { lines.push(`  @${id} @${getPolarity(scenario).toLocaleLowerCase('es')}`, `  Escenario: ${scenario.title || id}`); const prereqs = scenario.prerequisites ? (Array.isArray(scenario.prerequisites) ? scenario.prerequisites : [scenario.prerequisites]) : []; prereqs.forEach(value => lines.push(`    Dado ${value}`)); buildSteps(scenario).forEach((step, index) => lines.push(`    ${index === 0 && !prereqs.length ? 'Dado ' : 'Cuando '}${step}`)); if (scenario.expectedResult) lines.push(`    Entonces ${scenario.expectedResult}`); lines.push(''); });
+      const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })); link.download = `${currentPlan.storyId || 'qa'}-selected.feature`; link.click(); URL.revokeObjectURL(link.href);
+    }
+    async function pollPreparation(id) { try { const response = await fetch(`/api/prepare/${id}`); const data = await response.json(); if (data.status === 'planning') { show('Generando plan de pruebas…'); timer = setTimeout(() => pollPreparation(id), 2000); return; } setBusy(false); if (data.status === 'prepared') { renderPlan(data, id); return; } show(data.message || 'No se pudo preparar el plan.', true); } catch { setBusy(false); show('No se pudo conectar con el QA Runner. Inicia node tools/qa-runner.mjs.', true); } }
+    async function pollRun(id) { try { const response = await fetch(`/api/status/${id}`); const data = await response.json(); if (data.status === 'running') { setStage(3); show(`Ejecutando QA para US-${id}…`); timer = setTimeout(() => pollRun(id), 2500); return; } setBusy(false); if (data.status === 'completed' && data.reportUrl) { show(`US-${id} terminó. `); const link = document.createElement('a'); link.href = data.reportUrl; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'Abrir reporte HTML'; status.append(link); return; } show(data.message || 'La ejecución terminó sin reporte HTML.', true); } catch { setBusy(false); show('No se pudo conectar con el QA Runner.', true); } }
+    form.addEventListener('submit', async event => { event.preventDefault(); const id = taskInput.value.trim(); const testUrl = testUrlInput.value.trim(); if (!form.reportValidity() || !/^\d+$/.test(id)) { show('Introduce una tarea numérica y un host válido.', true); return; } setBusy(true); review.hidden = true; footer.hidden = true; show(`Validando el host y preparando US-${id}…`); try { const response = await fetch('/api/prepare', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, testUrl }) }); const data = await response.json(); if (!response.ok) { setBusy(false); show(data.message || 'No se pudo preparar la validación.', true); return; } if (data.status === 'prepared') { setBusy(false); renderPlan(data, id); return; } timer = setTimeout(() => pollPreparation(id), 1200); } catch { setBusy(false); show('No se pudo conectar con el QA Runner. Inicia node tools/qa-runner.mjs.', true); } });
+    scenarioList.addEventListener('change', updateSelection); scenarioList.addEventListener('click', event => { if (event.target.closest('input')) return; const row = event.target.closest('.scenario-row'); if (row && currentPlan) selectScenario(row); });
+    selectVisible.addEventListener('change', () => { scenarioList.querySelectorAll('.scenario-row:not([hidden]) .scenario-select').forEach(check => { check.checked = selectVisible.checked; }); updateSelection(); });
+    [severityFilter, typeFilter, polarityFilter].forEach(filter => filter.addEventListener('change', applyFilters)); searchInput.addEventListener('input', applyFilters); document.querySelectorAll('input[name="browser"]').forEach(browser => browser.addEventListener('change', updateSelection));
+    document.querySelectorAll('input[name="test-type"]').forEach(input => input.addEventListener('change', updateSelection));
+    document.querySelector('#edit-variables').addEventListener('click', () => { review.hidden = true; footer.hidden = true; setup.hidden = false; setStage(1); taskInput.focus(); });
+    [taskInput, testUrlInput].forEach(field => field.addEventListener('input', () => { if (!review.hidden) { review.hidden = true; footer.hidden = true; setup.hidden = false; setStage(1); show('Cambiaste los datos. Valídalos otra vez antes de ejecutar.'); } }));
+    runButton.addEventListener('click', async () => { const id = taskInput.value.trim(); const testUrl = testUrlInput.value.trim(); const selectedTestTypes = getSelectedTestTypes(); const functionalEnabled = selectedTestTypes.includes('functional'); const selectedChecks = functionalEnabled ? [...scenarioList.querySelectorAll('.scenario-select:checked')] : []; const selectedScenarioIds = selectedChecks.map(check => check.value); const polarities = new Set(selectedChecks.map(check => check.closest('.scenario-row').dataset.polarity)); const selectedBrowsers = functionalEnabled ? [...document.querySelectorAll('input[name="browser"]:checked')].map(browser => browser.value) : []; if (!selectedTestTypes.length) { show('Selecciona al menos una modalidad de prueba.', true); return; } if (functionalEnabled && (!selectedScenarioIds.length || !polarities.has('Positivo') || !polarities.has('Negativo') || polarities.has('Sin clasificar'))) { show('Para pruebas funcionales, selecciona al menos un caso positivo y uno negativo, y clasifica todos los casos elegidos.', true); return; } if (functionalEnabled && !selectedBrowsers.length) { show('Selecciona al menos un navegador para las pruebas funcionales.', true); return; } setBusy(true); setStage(3); show(`Iniciando ${selectedTestTypes.join(', ')}${functionalEnabled ? ` · ${selectedScenarioIds.length} casos en ${selectedBrowsers.join(', ')}` : ''}…`); try { const response = await fetch('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, testUrl, reviewed: true, selectedScenarioIds, selectedBrowsers, selectedTestTypes }) }); const data = await response.json(); if (!response.ok) { setBusy(false); setStage(2); show(data.message || 'No se pudo iniciar la ejecución.', true); return; } pollRun(id); } catch { setBusy(false); setStage(2); show('No se pudo conectar con el QA Runner.', true); } });
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 110" role="img" aria-labelledby="title desc">
+  <title id="title">SID</title>
+  <desc id="desc">Logotipo SID en letras azules dentro de un óvalo con anillos verdes y dorados</desc>
+  <ellipse cx="80" cy="55" rx="75" ry="50" fill="#fffdf7" stroke="#d7d0b2" stroke-width="3"/>
+  <ellipse cx="80" cy="55" rx="70" ry="46" fill="#fffefa" stroke="#27654d" stroke-width="4"/>
+  <ellipse cx="80" cy="55" rx="64" ry="40" fill="none" stroke="#bba85e" stroke-width="2"/>
+  <ellipse cx="80" cy="55" rx="59" ry="35" fill="none" stroke="#377454" stroke-width="2"/>
+  <text x="80" y="72" text-anchor="middle" fill="#075a87" font-family="Arial, Helvetica, sans-serif" font-size="43" font-weight="900" letter-spacing="1">SID</text>
+</svg>
